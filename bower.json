@@ -1,0 +1,5 @@
+{
+  "name": "gint-commerce",
+  "version": "0.0.1",
+  "main": "./bin/gint-commerce.js"
+}

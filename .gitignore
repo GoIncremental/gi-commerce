@@ -1,0 +1,8 @@
+node_modules/
+bin/
+!bin/gint-commerce.js
+coverage/
+temp/
+npm-debug.log
+
+.DS_Store
