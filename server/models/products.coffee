@@ -7,7 +7,7 @@ module.exports = (mongoose) ->
   modelName = 'Product'
 
   schema =
-    siteId: ObjectId
+    systemId: ObjectId
     parentId: ObjectId
     title: 'String'
     description: 'String'
