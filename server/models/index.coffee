@@ -1,4 +1,5 @@
 module.exports = (mongoose) ->
+  orderLines = require('./orderLines')(mongoose)
   orders: require('./orders')(mongoose)
-  orderLines: require('./orderLines')(mongoose)
-  products: require('./products')(mongoose)
+  orderLines: orderLines
+  products: require('./products')(mongoose, orderLines)
