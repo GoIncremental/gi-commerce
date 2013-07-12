@@ -4,21 +4,20 @@ angular.module('app').factory 'Order'
 
   crudService = Crud.factory 'orders', true
 
-  findById = (id, callback) ->
+  findById = (id) ->
+    deferred = $q.defer()
+
     crudService.get(id).then (order) ->
       if order? and order.owner?
-        order.orderLines = []
         Customer.getSimple order.owner.key, (customer) ->
           order.customer = customer
           OrderLine.forOrder(id).then (orderLines) ->
-            count = 0
-            angular.forEach orderLines, (orderLine) ->
-              count = count + 1
-              order.orderLines.push orderLine
-              if count is orderLines.length
-                callback(order) if callback
+            order.orderLines = orderLines
+            deferred.resolve order
       else
-        callback() if callback
+        deferred.resolve()
+
+    deferred.promise
   
   forOwner = (ownerId) ->
     deferred = $q.defer()
@@ -29,13 +28,18 @@ angular.module('app').factory 'Order'
   factory = () ->
     customerId: ''
     invoiceNumber: ''
-    date: moment().format('DD/MM/YYYY')
+    date: moment()
     notes: ''
     attributes: [
       {name: "confirmationSent", value: "false"}
       ,{name: "excessDue", value: "0"}
     ]
+  save = (item) ->
+    deferred = $q.defer()
+    item.date
+    crudService.save(item)
 
+    deferred.promise
   findById: findById
   get: findById
   destroy: crudService.destroy
