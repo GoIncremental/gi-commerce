@@ -9,4 +9,4 @@ require
     'services/order'
     'services/orderLine'
   ], () ->
-    console.log 'gint-commerce loaded'
+    return  #gint-commerce loaded

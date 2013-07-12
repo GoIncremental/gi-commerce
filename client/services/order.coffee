@@ -6,16 +6,19 @@ angular.module('app').factory 'Order'
 
   findById = (id, callback) ->
     crudService.get(id).then (order) ->
-      order.orderLines = []
-      Customer.getSimple order.owner.key, (customer) ->
-        order.customer = customer
-        OrderLine.forOrder(id).then (orderLines) ->
-          count = 0
-          angular.forEach orderLines, (orderLine) ->
-            count = count + 1
-            order.orderLines.push orderLine
-            if count is orderLines.length
-              callback(order) if callback
+      if order? and order.owner?
+        order.orderLines = []
+        Customer.getSimple order.owner.key, (customer) ->
+          order.customer = customer
+          OrderLine.forOrder(id).then (orderLines) ->
+            count = 0
+            angular.forEach orderLines, (orderLine) ->
+              count = count + 1
+              order.orderLines.push orderLine
+              if count is orderLines.length
+                callback(order) if callback
+      else
+        callback() if callback
   
   forOwner = (ownerId) ->
     deferred = $q.defer()
