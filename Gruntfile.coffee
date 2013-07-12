@@ -87,7 +87,7 @@ module.exports = (grunt) ->
 
             return contents
           optimize: 'none'
-          out: 'bin/gint-security.js'
+          out: 'bin/gint-commerce.js'
           preserveLicenseComments: false
           skipModuleInsertion: true
           uglify:

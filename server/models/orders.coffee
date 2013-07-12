@@ -1,5 +1,6 @@
 gint = require 'gint-util'
-module.exports = (mongoose) ->
+async = require 'async'
+module.exports = (mongoose, orderLines) ->
 
   Schema = mongoose.Schema
   ObjectId = Schema.Types.ObjectId
@@ -17,8 +18,34 @@ module.exports = (mongoose) ->
       name: 'String'
       value: 'String'
     ]
-
+  
   mongoose.model modelName, schema
-  exports = gint.models.crud mongoose.model(modelName)
-  exports.name = modelName
-  exports
+  
+  crud = gint.models.crud mongoose.model(modelName)
+
+  destroy = (id, callback) ->
+    #first find all associated Order Lines
+    options =
+      query:
+        orderId: id
+
+    orderLines.find options, (err, lines) ->
+      if lines? and (not err)
+        async.each lines
+        , (line, done) ->
+          console.log 'destroying an order line'
+          orderLines.destroy line._id, done
+        , () ->
+          console.log 'then destroying an order'
+          crud.destroy id, callback
+      else
+        console.log 'just destryoing an order'
+        crud.destroy id, callback
+  
+  find: crud.find
+  findById: crud.findById
+  findOneBy: crud.findOneBy
+  create: crud.create
+  update: crud.update
+  destroy: destroy
+  name: modelName
