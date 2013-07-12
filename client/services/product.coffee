@@ -8,13 +8,9 @@ angular.module('app').factory 'Product'
   findById = (id) ->
     deferred = $q.defer()
     crudService.get(id).then (product) ->
-      product.jsdate = new Date(product.date)
+      product.date = new Date(product.date)
       deferred.resolve product
     deferred.promise
-
-  save = (product) ->
-    product.date = moment(product.jsdate).format('DD/MM/YYYY')
-    crudService.save(product)
         
   forCategory = (id) ->
     deferred = $q.defer()
@@ -37,7 +33,7 @@ angular.module('app').factory 'Product'
         siteId: product.siteId
         stock: product.stock
         price: product.price
-        jsdate: new Date()
+        date: new Date()
         categories: product.categories
         parentId: parentId
         description: product.description
@@ -52,7 +48,7 @@ angular.module('app').factory 'Product'
   get: findById
   findById: findById
   getCached: crudService.getCached
-  save: save
+  save: crudService.save
   destroy: crudService.destroy
   forCategory: forCategory
 
