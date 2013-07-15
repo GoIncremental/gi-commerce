@@ -21,25 +21,21 @@ angular.module('app').factory 'Order'
   
   forOwner = (ownerId) ->
     deferred = $q.defer()
-    crudService.query({'owner.key': ownerId}).then (emails) ->
-      deferred.resolve emails
+    crudService.query({'owner.key': ownerId}).then (orders) ->
+      deferred.resolve orders
     deferred.promise
 
   factory = () ->
     customerId: ''
     invoiceNumber: ''
-    date: moment()
+    date: moment().toDate()
     notes: ''
     attributes: [
       {name: "confirmationSent", value: "false"}
       ,{name: "excessDue", value: "0"}
     ]
-  save = (item) ->
-    deferred = $q.defer()
-    item.date
-    crudService.save(item)
 
-    deferred.promise
+
   findById: findById
   get: findById
   destroy: crudService.destroy

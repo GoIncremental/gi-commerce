@@ -5,10 +5,20 @@ angular.module('app').factory 'Product'
 
   crudService = Crud.factory 'products', true
 
+  all = (params) ->
+    deferred = $q.defer()
+    crudService.all(params).then (products) ->
+      angular.forEach products, (product) ->
+        d = product.date
+        product.date = moment([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
+      deferred.resolve products
+    deferred.promise
+
   findById = (id) ->
     deferred = $q.defer()
     crudService.get(id).then (product) ->
-      product.date = new Date(product.date)
+      d = product.date
+      product.date = moment([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
       deferred.resolve product
     deferred.promise
         
@@ -26,6 +36,18 @@ angular.module('app').factory 'Product'
 
     deferred.promise
 
+  save = (product) ->
+    d = product.date
+    product.date =  moment.utc([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
+    crudService.save(product)
+
+  getCached (id) ->
+    product = crudService.getCached(id)
+    if product?
+      d = product.date
+      product.date =  moment([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
+    product
+
   variantFactory = (parentId, callback) ->
     deferred = $q.defer()
     crudService.get(parentId).then (product) ->
@@ -33,7 +55,7 @@ angular.module('app').factory 'Product'
         siteId: product.siteId
         stock: product.stock
         price: product.price
-        date: new Date()
+        date: moment().toDate()
         categories: product.categories
         parentId: parentId
         description: product.description
@@ -44,11 +66,11 @@ angular.module('app').factory 'Product'
 
 
   variantFactory: variantFactory
-  all: crudService.all
+  all: all
   get: findById
   findById: findById
-  getCached: crudService.getCached
-  save: crudService.save
+  getCached: getCached
+  save: save
   destroy: crudService.destroy
   forCategory: forCategory
 
