@@ -29,7 +29,7 @@ angular.module('app').factory 'Product'
         (category.slug is id) or (category._id is id)
       )
       if catList.length > 0 
-        crudService.all({categories: catList[0]._id}).then (results) ->
+        all({categories: catList[0]._id}).then (results) ->
           deferred.resolve results
       else
         deferred.resolve()
