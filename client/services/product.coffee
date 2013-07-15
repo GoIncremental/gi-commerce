@@ -9,7 +9,7 @@ angular.module('app').factory 'Product'
     deferred = $q.defer()
     crudService.all(params).then (products) ->
       angular.forEach products, (product) ->
-        d = product.date
+        d = moment.utc(product.date).toDate()
         product.date = moment([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
       deferred.resolve products
     deferred.promise
@@ -17,7 +17,7 @@ angular.module('app').factory 'Product'
   findById = (id) ->
     deferred = $q.defer()
     crudService.get(id).then (product) ->
-      d = product.date
+      d = moment.utc(product.date).toDate()
       product.date = moment([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
       deferred.resolve product
     deferred.promise
@@ -41,10 +41,10 @@ angular.module('app').factory 'Product'
     product.date =  moment.utc([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
     crudService.save(product)
 
-  getCached (id) ->
+  getCached = (id) ->
     product = crudService.getCached(id)
     if product?
-      d = product.date
+      d = moment.utc(product.date).toDate()
       product.date =  moment([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
     product
 
