@@ -10,7 +10,9 @@ angular.module('app').factory 'Product'
     crudService.all(params).then (products) ->
       angular.forEach products, (product) ->
         d = moment.utc(product.date).toDate()
-        product.date = moment([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
+        product.date = moment(
+          [d.getFullYear(),d.getMonth(),d.getDate()]
+        ).toDate()
       deferred.resolve products
     deferred.promise
 
@@ -28,7 +30,7 @@ angular.module('app').factory 'Product'
       catList = $filter('filter')(categories, (category) ->
         (category.slug is id) or (category._id is id)
       )
-      if catList.length > 0 
+      if catList.length > 0
         all({categories: catList[0]._id}).then (results) ->
           deferred.resolve results
       else
@@ -38,14 +40,18 @@ angular.module('app').factory 'Product'
 
   save = (product) ->
     d = product.date
-    product.date =  moment.utc([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
+    product.date =  moment.utc(
+      [d.getFullYear(),d.getMonth(),d.getDate()]
+    ).toDate()
     crudService.save(product)
 
   getCached = (id) ->
     product = crudService.getCached(id)
     if product?
       d = moment.utc(product.date).toDate()
-      product.date =  moment([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
+      product.date =  moment(
+        [d.getFullYear(),d.getMonth(),d.getDate()]
+      ).toDate()
     product
 
   variantFactory = (parentId, callback) ->

@@ -1,6 +1,5 @@
-gint = require 'gint-util'
 async = require 'async'
-module.exports = (mongoose, orderLines) ->
+module.exports = (mongoose, orderLines, crudModelFactory) ->
 
   Schema = mongoose.Schema
   ObjectId = Schema.Types.ObjectId
@@ -8,7 +7,7 @@ module.exports = (mongoose, orderLines) ->
   modelName = 'Order'
 
   schema =
-    owner: 
+    owner:
       key: ObjectId
       resourceType: 'String'
     date: 'Date'
@@ -21,7 +20,7 @@ module.exports = (mongoose, orderLines) ->
   
   mongoose.model modelName, schema
   
-  crud = gint.models.crud mongoose.model(modelName)
+  crud = crudModelFactory mongoose.model(modelName)
 
   destroy = (id, callback) ->
     #first find all associated Order Lines

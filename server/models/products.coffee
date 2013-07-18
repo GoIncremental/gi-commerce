@@ -1,7 +1,6 @@
-gint = require 'gint-util'
 async = require 'async'
 
-module.exports = (mongoose, orderLines) ->
+module.exports = (mongoose, orderLines, crudModelFactory) ->
 
   Schema = mongoose.Schema
   ObjectId = Schema.Types.ObjectId
@@ -18,7 +17,7 @@ module.exports = (mongoose, orderLines) ->
     notes: 'String'
     price: 'Number'
     classification: 'String'
-    date: 
+    date:
       type: 'Date'
       default: Date.now
     visible: 'Boolean'
@@ -55,7 +54,7 @@ module.exports = (mongoose, orderLines) ->
 
   mongoose.model modelName, objectSchema
   
-  crud = gint.models.crud mongoose.model(modelName)
+  crud = crudModelFactory mongoose.model(modelName)
 
   find = (options, callback) ->
     crud.find options, (err, results, pageCount) ->

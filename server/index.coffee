@@ -1,12 +1,11 @@
 util = require 'util'
 gint = require 'gint-util'
-
-module.exports = (app, mongoose, auth) ->
+routes = require './routes'
+configure = (app, mongoose) ->
   
-  models = require('./models')(mongoose)
-  controllers = require('./controllers')(models, gint)
+  gint.common.extend app.models, require('./models')(mongoose, app.models.crud)
+  gint.common.extend app.controllers, require('./controllers')(app)
   
-  require('./routes')(app, auth, controllers)
+  routes.configure app
 
-  models: models
-  controllers: controllers
+exports.configure = configure

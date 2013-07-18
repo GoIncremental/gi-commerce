@@ -1,4 +1,4 @@
-module.exports = (models, gint) ->
-  order:  gint.controllers.crud(models.orders)
-  orderLine: gint.controllers.crud(models.orderLines)
-  product: gint.controllers.crud(models.products)
+module.exports = (app) ->
+  order:  app.controllers.crud(app.models.orders)
+  orderLine: app.controllers.crud(app.models.orderLines)
+  product: app.controllers.crud(app.models.products)
