@@ -22,11 +22,12 @@ module.exports = (mongoose, orderLines, crudModelFactory) ->
   
   crud = crudModelFactory mongoose.model(modelName)
 
-  destroy = (id, callback) ->
+  destroy = (id, systemId, callback) ->
     #first find all associated Order Lines
     options =
       query:
         orderId: id
+        systemId: systemId
 
     orderLines.find options, (err, lines) ->
       if lines? and (not err)
@@ -39,7 +40,7 @@ module.exports = (mongoose, orderLines, crudModelFactory) ->
           crud.destroy id, callback
       else
         console.log 'just destryoing an order'
-        crud.destroy id, callback
+        crud.destroy id, systemId callback
   
   find: crud.find
   findById: crud.findById

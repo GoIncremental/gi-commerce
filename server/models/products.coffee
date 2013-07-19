@@ -39,6 +39,7 @@ module.exports = (mongoose, orderLines, crudModelFactory) ->
     options =
       query:
         productId: @_id
+        systemId: @systemId
 
     orderLines.find options, (err, lines) ->
       that._stockLevel = that.stock
@@ -71,8 +72,8 @@ module.exports = (mongoose, orderLines, crudModelFactory) ->
           #the callback when all iterations have calledback
           callback err, simpleResults, pageCount
   
-  findById = (id, callback) ->
-    crud.findById id, (err, product) ->
+  findById = (id, systemId, callback) ->
+    crud.findById id, systemId, (err, product) ->
       if err or not product?
         callback(err) if callback
       else
@@ -80,8 +81,8 @@ module.exports = (mongoose, orderLines, crudModelFactory) ->
           res = product.toObject()
           callback(err, res) if callback
 
-  findOneBy = (key, value, callback) ->
-    crud.findOneBy key, value, (err, product) ->
+  findOneBy = (key, value, systemId, callback) ->
+    crud.findOneBy key, value, systemId, (err, product) ->
       if err or not product?
         callback(err) if callback
       else
