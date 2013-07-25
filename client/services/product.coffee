@@ -72,6 +72,7 @@ angular.module('app').factory 'Product'
 
 
   variantFactory: variantFactory
+  query: all
   all: all
   get: findById
   findById: findById
