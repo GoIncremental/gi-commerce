@@ -155,7 +155,7 @@ module.exports = (grunt) ->
   , 'requirejs', 'copy:dev', 'clean:temp']
 
   grunt.registerTask 'default'
-  , ['build', 'mocha:unit', 'karma:singleUnit', 'clean:bin']
+  , ['build', 'clean:bin']
 
   grunt.registerTask 'travis'
   , ['build', 'mocha:travis', 'karma:travis' ]
