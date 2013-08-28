@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "coffee-script": "~1.4.0",
-    "gint-util": "git+ssh://git@github.com:Gintellect/gint-util.git#v0.1.14",
+    "gint-util": "git+ssh://git@github.com:Gintellect/gint-util.git#v0.1.20",
     "async": "~0.2.9"
   },
   "devDependencies": {
