@@ -1,6 +1,6 @@
 ###global angular ###
-angular.module('app').factory 'Product'
-, ['$q', '$filter', 'Crud', 'Category', 'OrderLine'
+angular.module('gi.commerce').factory 'giProduct'
+, ['$q', '$filter', 'giCrud', 'giCategory', 'giOrderLine'
 , ($q, $filter, Crud, Category, OrderLine) ->
 
   crudService = Crud.factory 'products', true
@@ -23,7 +23,7 @@ angular.module('app').factory 'Product'
       product.date = moment([d.getFullYear(),d.getMonth(),d.getDate()]).toDate()
       deferred.resolve product
     deferred.promise
-        
+
   forCategory = (id) ->
     deferred = $q.defer()
     Category.all().then (categories) ->

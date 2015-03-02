@@ -1,5 +1,6 @@
 {
-  "name": "gint-commerce",
-  "version": "0.0.1",
-  "main": "./bin/gint-commerce.js"
+  "name": "gi-commerce",
+  "version": "0.0.2",
+  "main": "./dist/gi.commerce.js",
+  "ignore": ["/client", "/server", "package.json", ".npmignore"]
 }

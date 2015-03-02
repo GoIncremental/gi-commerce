@@ -1,5 +1,5 @@
-angular.module('app').factory 'Order'
-, ['$q', 'Crud', 'Customer', 'OrderLine'
+angular.module('gi.commerce').factory 'giOrder'
+, ['$q', 'giCrud', 'giCustomer', 'giOrderLine'
 , ($q, Crud, Customer, OrderLine) ->
 
   crudService = Crud.factory 'orders', true
@@ -18,7 +18,7 @@ angular.module('app').factory 'Order'
         deferred.resolve()
 
     deferred.promise
-  
+
   forOwner = (ownerId) ->
     deferred = $q.defer()
     crudService.query({'owner.key': ownerId}).then (orders) ->
