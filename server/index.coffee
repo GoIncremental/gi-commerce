@@ -1,11 +1,14 @@
-util = require 'util'
-gint = require 'gint-util'
+gi = require 'gi-util'
 routes = require './routes'
-configure = (app, mongoose) ->
-  
-  gint.common.extend app.models, require('./models')(mongoose, app.models.crud)
-  gint.common.extend app.controllers, require('./controllers')(app)
-  
-  routes.configure app
+controllers = require './controllers'
+modelsFactory = require './models'
+configure = (app, dal, options) ->
 
-exports.configure = configure
+  models = modelsFactory dal, options
+  gi.common.extend app.models, models
+  gi.common.extend app.controllers, controllers(app)
+
+  routes.configure app, gi.common.rest
+
+module.exports =
+  configure: configure

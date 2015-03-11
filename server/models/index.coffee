@@ -1,6 +1,8 @@
-module.exports = (mongoose, crudModelFactory) ->
-  orderLines = require('./orderLines')(mongoose, crudModelFactory)
+priceLists = require './priceLists'
+currencies = require './currencies'
+countries = require './countries'
 
-  orderLines: orderLines
-  orders: require('./orders')(mongoose, orderLines, crudModelFactory)
-  products: require('./products')(mongoose, orderLines, crudModelFactory)
+module.exports = (dal, options) ->
+  priceLists: priceLists dal
+  currencies: currencies dal
+  countries:  countries dal

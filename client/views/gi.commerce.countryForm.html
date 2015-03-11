@@ -1,0 +1,38 @@
+<div ng-form name="countryForm" class="well form">
+  <div class="form-group">
+    <label>Name:</label>
+    <input type="text"
+           class="form-control"
+           name="countryName"
+           ng-model="model.selectedItem.name"/>
+  </div>
+  <div class="form-group">
+    <label>Code:</label>
+    <input type="text"
+           class="form-control"
+           name="countryCode"
+           ng-model="model.selectedItem.code"/>
+  </div>
+  <div class="form-group">
+    <label class="control-label">Currency:</label>
+    <ui-select ng-model="model.selectedItem.currencyId">
+      <ui-select-match>{{$select.selected.name}}</ui-select-match>
+      <ui-select-choices repeat="c._id as c in model.currencies  | filter: $select.search">
+        <div ng-bind-html="c.name | highlight: $select.search"></div>
+      </ui-select-choices>
+    </ui-select>
+  </div>
+  <div class="form-group">
+    <button class="form-control btn btn-primary btn-save-asset"
+            ng-click="save()">{{submitText}}</button>
+  </div>
+  <div class="form-group" ng-show="assetForm.$dirty || model.selectedItem._id">
+    <button class="form-control btn btn-warning"
+            ng-click="clear()">Cancel</button>
+  </div>
+  <div class="form-group" ng-show="model.selectedItem._id">
+    <button class="form-control btn btn-danger" ng-click="destroy()">
+      Delete <span ng-if="confirm">- Are you sure? Click again to confirm</span>
+    </button>
+  </div>
+</div>

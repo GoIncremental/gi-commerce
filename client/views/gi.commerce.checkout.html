@@ -1,0 +1,17 @@
+<div class="container">
+  <gi-cart-stage model="model"></gi-cart-stage>
+  <div class="row">
+    <div class="col-md-1">
+      <div ng-if="cart.getStage() > 1" class="btn btn-primary" ng-click="cart.prevStage()">Prev</div>
+    </div>
+    <div class="col-md-1 col-md-offset-10">
+      <div ng-if="cart.getStage() < 4" class="btn btn-primary" ng-click="cart.nextStage()">Next</div>
+    </div>
+  </div>
+  <div class="row small-gap">
+    <gi-cart ng-if="cart.getStage() == 1" model="model"></gi-cart>
+    <pre ng-if="cart.getStage() == 2">Address capture form to go here</pre>
+    <pre ng-if="cart.getStage() == 3">Stripe Payment form to go here</pre>
+    <pre ng-if="cart.getStage() == 4">Thankyou message to go here</pre>
+  </div>
+</div>

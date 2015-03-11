@@ -1,4 +1,6 @@
+gi = require 'gi-util'
+conFac = gi.common.crudControllerFactory
 module.exports = (app) ->
-  order:  app.controllers.crud(app.models.orders)
-  orderLine: app.controllers.crud(app.models.orderLines)
-  product: app.controllers.crud(app.models.products)
+  priceList:    conFac app.models.priceLists
+  currency:     conFac app.models.currencies
+  country:      conFac app.models.countries

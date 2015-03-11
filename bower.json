@@ -1,6 +1,13 @@
 {
   "name": "gi-commerce",
-  "version": "0.0.2",
+  "version": "0.3.0",
   "main": "./dist/gi.commerce.js",
-  "ignore": ["/client", "/server", "package.json", ".npmignore"]
+  "ignore": [
+    "/client",
+    "/server",
+    "package.json",
+    ".npmignore",
+    ".gitignore",
+    "gulpfile.coffee"
+  ]
 }

@@ -1,3 +1,6 @@
 node_modules/
 client/
 test/
+dist/
+bower.json
+gulpfile.coffee
