@@ -1,0 +1,46 @@
+<div ng-form name="priceForm" class="well form">
+  <div class="form-group">
+    <label>Name:</label>
+    <input type="text"
+           class="form-control"
+           name="priceListName"
+           ng-model="model.selectedItem.name"/>
+  </div>
+  <div class="form-group">
+    <label>Prices:</label>
+    <div ng-repeat="(code, price) in model.selectedItem.prices">
+      <div class="input-group">
+         <div class="input-group-addon currency">{{code}}</div>
+         <input type="text" class="form-control" id="exampleInputAmount" placeholder="Amount" ng-model="model.selectedItem.prices[code]"/>
+         <div class="input-group-addon" ng-click="removePriceForCurrency(code)">  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></div>
+       </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="input-group">
+      <div class="input-group-addon currency" style="">
+        <ui-select ng-model="local.code">
+           <ui-select-match>{{$select.selected.code}}</ui-select-match>
+           <ui-select-choices repeat="c.code as c in model.currencies  | filter: $select.search">
+             <div ng-bind-html="c.code | highlight: $select.search"></div>
+           </ui-select-choices>
+        </ui-select>
+      </div>
+      <input type="text" class="form-control currency-pick" id="exampleInputAmount" placeholder="Enter Amount" ng-model="local.price"/>
+      <div class="input-group-addon" ng-click="savePriceForCurrency(local.code)">  <span class="glyphicon glyphicon-save" aria-hidden="true"></span></div>
+     </div>
+  </div>
+  <div class="form-group">
+    <button class="form-control btn btn-success btn-save-asset"
+            ng-click="save()">{{submitText}}</button>
+  </div>
+  <div class="form-group" ng-show="priceForm.$dirty || model.selectedItem._id">
+    <button class="form-control btn btn-warning"
+            ng-click="clear()">Cancel</button>
+  </div>
+  <div class="form-group" ng-show="model.selectedItem._id">
+    <button class="form-control btn btn-danger" ng-click="destroy()">
+      Delete <span ng-if="confirm">- Are you sure? Click again to confirm</span>
+    </button>
+  </div>
+</div>

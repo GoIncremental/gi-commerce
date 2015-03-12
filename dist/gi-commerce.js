@@ -11,11 +11,30 @@ angular.module('gi.commerce', ['gi.util']).value('version', '0.2.0').run([
   }
 ]);
 
-angular.module('gi.commerce').config([
-  '$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
-    return $routeProvider.when('/admin/priceList', {
-      templateUrl: 'gi.commerce.priceList.html'
-    });
+angular.module('gi.commerce').filter('giCurrency', [
+  '$filter', function($filter) {
+    return function(amount, currencySymbol, fractionSize) {
+      if (angular.isFunction(currencySymbol)) {
+        currencySymbol = currencySymbol();
+      }
+      return $filter('currency')(amount, currencySymbol, fractionSize);
+    };
+  }
+]);
+
+angular.module('gi.commerce').filter('giCurrencyId', [
+  'giCurrency', function(Currency) {
+    return function(currencyId) {
+      var cur, result;
+      result = "N/A";
+      if (currencyId != null) {
+        cur = Currency.getCached(currencyId);
+        if (cur != null) {
+          result = cur.symbol + ' ' + cur.code;
+        }
+      }
+      return result;
+    };
   }
 ]);
 
@@ -107,14 +126,6 @@ angular.module('gi.commerce').directive('giCheckout', [
   }
 ]);
 
-angular.module("gi.commerce").run(["$templateCache", function($templateCache) {$templateCache.put("gi.commerce.addtocart.html","<div ng-hide=\"attrs.id\">\n    <a class=\"btn btn-lg btn-primary\" ng-disabled=\"true\" ng-transclude></a>\n</div>\n<div ng-show=\"attrs.id\">\n    <div ng-hide=\"inCart()\">\n        <a class=\"btn btn-lg btn-primary\"\n           ng-click=\"addItem(item)\"\n           ng-transclude></a>\n    </div>\n    <div class=\"alert alert-info\"  ng-show=\"inCart()\">\n        This item is in your cart\n    </div>\n</div>\n");
-$templateCache.put("gi.commerce.cart.html","\n<div class=\"col-xs-12\" ng-show=\"giCart.totalItems() === 0\">\n    Your cart is empty\n</div>\n\n<div class=\"table-responsive col-xs-12\" ng-show=\"giCart.totalItems() > 0\">\n\n    <table class=\"table table-striped giCart cart\">\n\n        <thead>\n        <tr>\n            <th></th>\n            <th></th>\n            <th>Quantity</th>\n            <th>Amount</th>\n            <th>Total</th>\n        </tr>\n        </thead>\n        <tfoot>\n        <tr ng-show=\"giCart.getTax()\">\n            <th></th>\n            <th></th>\n            <th></th>\n            <th>Tax ({{ giCart.getCart().tax }}%):</th>\n            <th>{{ giCart.getTax() | giCurrency:giCart.getCurrencySymbol }}</th>\n        </tr>\n        <tr ng-show=\"giCart.getShipping()\">\n            <th></th>\n            <th></th>\n            <th></th>\n            <th>Shipping:</th>\n            <th>{{ giCart.getShipping() | giCurrency:giCart.getCurrencySymbol }}</th>\n        </tr>\n        <tr>\n            <th></th>\n            <th></th>\n            <th></th>\n            <th>Total:</th>\n            <th>{{ giCart.totalCost() | giCurrency:giCart.getCurrencySymbol }}</th>\n        </tr>\n        </tfoot>\n        <tbody>\n        <tr ng-repeat=\"item in giCart.getItems() track by $index\">\n            <td><span ng-click=\"giCart.removeItem($index)\" class=\"glyphicon glyphicon-remove\"></span></td>\n            <td>{{ item.getName() }}</td>\n            <td><span class=\"glyphicon glyphicon-minus\" ng-class=\"{\'disabled\':item.getQuantity()==1}\"\n                      ng-click=\"item.setQuantity(-1, true)\"></span>&nbsp;&nbsp;\n                {{ item.getQuantity() | number }}&nbsp;&nbsp;\n                <span class=\"glyphicon glyphicon-plus\" ng-click=\"item.setQuantity(1, true)\"></span></td>\n            <td>{{ item.getPrice() | giCurrency:giCart.getCurrencySymbol}}</td>\n            <td>{{ item.getTotal() | giCurrency:giCart.getCurrencySymbol }}</td>\n        </tr>\n        </tbody>\n    </table>\n</div>\n<style>\n    .giCart.cart span[ng-click] {\n        cursor: pointer;\n    }\n    .giCart.cart .glyphicon.disabled {\n        color:#aaa;\n    }\n</style>\n");
-$templateCache.put("gi.commerce.cartStage.html","<div class=\"row gi-checkout\" style=\"border-bottom:0;\">\n  <div class=\"col-xs-3 gi-checkout-stage\"\n       ng-class=\"{complete: cart.getStage()>1, active: cart.getStage()==1}\">\n    <div class=\"text-center gi-checkout-stagenum\">Review Cart</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(1)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n    ng-class=\"{complete: cart.getStage()>2, active: cart.getStage()==2, disabled: cart.getStage()<2}\">\n    <div class=\"text-center gi-checkout-stagenum\">Your Details</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(2)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n    ng-class=\"{complete: cart.getStage()>3, active: cart.getStage()==3, disabled: cart.getStage()<3}\">\n    <div class=\"text-center gi-checkout-stagenum\">Payment</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(3)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n       ng-class=\"{complete: cart.getStage()>4, active: cart.getStage()==4, disabled: cart.getStage()<4}\">\n    <div class=\"text-center gi-checkout-stagenum\">Complete</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(4)\" class=\"gi-checkout-dot\"></a>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.checkout.html","<div class=\"container\">\n  <gi-cart-stage model=\"model\"></gi-cart-stage>\n  <div class=\"row\">\n    <div class=\"col-md-1\">\n      <div ng-if=\"cart.getStage() > 1\" class=\"btn btn-primary\" ng-click=\"cart.prevStage()\">Prev</div>\n    </div>\n    <div class=\"col-md-1 col-md-offset-10\">\n      <div ng-if=\"cart.getStage() < 4\" class=\"btn btn-primary\" ng-click=\"cart.nextStage()\">Next</div>\n    </div>\n  </div>\n  <div class=\"row small-gap\">\n    <gi-cart ng-if=\"cart.getStage() == 1\" model=\"model\"></gi-cart>\n    <pre ng-if=\"cart.getStage() == 2\">Address capture form to go here</pre>\n    <pre ng-if=\"cart.getStage() == 3\">Stripe Payment form to go here</pre>\n    <pre ng-if=\"cart.getStage() == 4\">Thankyou message to go here</pre>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.countryForm.html","<div ng-form name=\"countryForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"countryName\"\n           ng-model=\"model.selectedItem.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"countryCode\"\n           ng-model=\"model.selectedItem.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label class=\"control-label\">Currency:</label>\n    <ui-select ng-model=\"model.selectedItem.currencyId\">\n      <ui-select-match>{{$select.selected.name}}</ui-select-match>\n      <ui-select-choices repeat=\"c._id as c in model.currencies  | filter: $select.search\">\n        <div ng-bind-html=\"c.name | highlight: $select.search\"></div>\n      </ui-select-choices>\n    </ui-select>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"assetForm.$dirty || model.selectedItem._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"model.selectedItem._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.currencyForm.html","<div ng-form name=\"currencyForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencyName\"\n           ng-model=\"item.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencyCode\"\n           ng-model=\"item.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Symbol:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencSymbol\"\n           ng-model=\"item.symbol\"/>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"assetForm.$dirty || item._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"item._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.priceList.html","<pre>This is the pricelist template</pre>\n");
-$templateCache.put("gi.commerce.summary.html","<div class=\"row\">\n  <div class=\"col-xs-5\">\n    <svg version=\"1.1\"  class=\"icon basket\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"30px\" height=\"30px\" xml:space=\"preserve\">\n      <path d=\"M27.715,10.48l-2.938,6.312c-0.082,0.264-0.477,0.968-1.318,0.968H11.831\n                c-0.89,0-1.479-0.638-1.602-0.904l-2.048-6.524C7.629,8.514,8.715,7.933,9.462,7.933c0.748,0,14.915,0,16.805,0\n                C27.947,7.933,28.17,9.389,27.715,10.48L27.715,10.48z M9.736,9.619c0.01,0.061,0.026,0.137,0.056,0.226l1.742,6.208\n                c0.026,0.017,0.058,0.028,0.089,0.028h11.629l2.92-6.27c0.025-0.073,0.045-0.137,0.053-0.192H9.736L9.736,9.619z M13.544,25.534\n                c-0.819,0-1.482-0.662-1.482-1.482s0.663-1.484,1.482-1.484c0.824,0,1.486,0.664,1.486,1.484S14.369,25.534,13.544,25.534\n                L13.544,25.534z M23.375,25.534c-0.82,0-1.482-0.662-1.482-1.482s0.662-1.484,1.482-1.484c0.822,0,1.486,0.664,1.486,1.484\n                S24.197,25.534,23.375,25.534L23.375,25.534z M24.576,21.575H13.965c-2.274,0-3.179-2.151-3.219-2.244\n                c-0.012-0.024-0.021-0.053-0.028-0.076c0,0-3.56-12.118-3.834-13.05c-0.26-0.881-0.477-1.007-1.146-1.007H2.9\n                c-0.455,0-0.82-0.364-0.82-0.818s0.365-0.82,0.82-0.82h2.841c1.827,0,2.4,1.103,2.715,2.181\n                c0.264,0.898,3.569,12.146,3.821,12.999c0.087,0.188,0.611,1.197,1.688,1.197h10.611c0.451,0,0.818,0.368,0.818,0.818\n                C25.395,21.21,25.027,21.575,24.576,21.575L24.576,21.575z\"/>\n    </svg>\n  </div>\n  <div class=\"col-xs-7\">\n    <span class=\"badge\">{{ giCart.totalItems() }}</span>\n  </div>\n</div>\n");}]);
 angular.module('gi.commerce').directive('giCountryForm', [
   '$q', 'giCurrency', 'giCountry', function($q, Currency, Country) {
     return {
@@ -185,6 +196,14 @@ angular.module('gi.commerce').directive('giCountryForm', [
   }
 ]);
 
+angular.module("gi.commerce").run(["$templateCache", function($templateCache) {$templateCache.put("gi.commerce.addtocart.html","<div ng-hide=\"attrs.id\">\n    <a class=\"btn btn-lg btn-primary\" ng-disabled=\"true\" ng-transclude></a>\n</div>\n<div ng-show=\"attrs.id\">\n    <div ng-hide=\"inCart()\">\n        <a class=\"btn btn-lg btn-primary\"\n           ng-click=\"addItem(item)\"\n           ng-transclude></a>\n    </div>\n    <div class=\"alert alert-info\"  ng-show=\"inCart()\">\n        This item is in your cart\n    </div>\n</div>\n");
+$templateCache.put("gi.commerce.cart.html","\n<div class=\"col-xs-12\" ng-show=\"giCart.totalItems() === 0\">\n    Your cart is empty\n</div>\n\n<div class=\"table-responsive col-xs-12\" ng-show=\"giCart.totalItems() > 0\">\n\n    <table class=\"table table-striped giCart cart\">\n\n        <thead>\n        <tr>\n            <th></th>\n            <th></th>\n            <th>Quantity</th>\n            <th>Amount</th>\n            <th>Total</th>\n        </tr>\n        </thead>\n        <tfoot>\n        <tr ng-show=\"giCart.getTax()\">\n            <th></th>\n            <th></th>\n            <th></th>\n            <th>Tax ({{ giCart.getCart().tax }}%):</th>\n            <th>{{ giCart.getTax() | giCurrency:giCart.getCurrencySymbol }}</th>\n        </tr>\n        <tr ng-show=\"giCart.getShipping()\">\n            <th></th>\n            <th></th>\n            <th></th>\n            <th>Shipping:</th>\n            <th>{{ giCart.getShipping() | giCurrency:giCart.getCurrencySymbol }}</th>\n        </tr>\n        <tr>\n            <th></th>\n            <th></th>\n            <th></th>\n            <th>Total:</th>\n            <th>{{ giCart.totalCost() | giCurrency:giCart.getCurrencySymbol }}</th>\n        </tr>\n        </tfoot>\n        <tbody>\n        <tr ng-repeat=\"item in giCart.getItems() track by $index\">\n            <td><span ng-click=\"giCart.removeItem($index)\" class=\"glyphicon glyphicon-remove\"></span></td>\n            <td>{{ item.getName() }}</td>\n            <td><span class=\"glyphicon glyphicon-minus\" ng-class=\"{\'disabled\':item.getQuantity()==1}\"\n                      ng-click=\"item.setQuantity(-1, true)\"></span>&nbsp;&nbsp;\n                {{ item.getQuantity() | number }}&nbsp;&nbsp;\n                <span class=\"glyphicon glyphicon-plus\" ng-click=\"item.setQuantity(1, true)\"></span></td>\n            <td>{{ item.getPrice() | giCurrency:giCart.getCurrencySymbol}}</td>\n            <td>{{ item.getTotal() | giCurrency:giCart.getCurrencySymbol }}</td>\n        </tr>\n        </tbody>\n    </table>\n</div>\n<style>\n    .giCart.cart span[ng-click] {\n        cursor: pointer;\n    }\n    .giCart.cart .glyphicon.disabled {\n        color:#aaa;\n    }\n</style>\n");
+$templateCache.put("gi.commerce.cartStage.html","<div class=\"row gi-checkout\" style=\"border-bottom:0;\">\n  <div class=\"col-xs-3 gi-checkout-stage\"\n       ng-class=\"{complete: cart.getStage()>1, active: cart.getStage()==1}\">\n    <div class=\"text-center gi-checkout-stagenum\">Review Cart</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(1)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n    ng-class=\"{complete: cart.getStage()>2, active: cart.getStage()==2, disabled: cart.getStage()<2}\">\n    <div class=\"text-center gi-checkout-stagenum\">Your Details</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(2)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n    ng-class=\"{complete: cart.getStage()>3, active: cart.getStage()==3, disabled: cart.getStage()<3}\">\n    <div class=\"text-center gi-checkout-stagenum\">Payment</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(3)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n       ng-class=\"{complete: cart.getStage()>4, active: cart.getStage()==4, disabled: cart.getStage()<4}\">\n    <div class=\"text-center gi-checkout-stagenum\">Complete</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(4)\" class=\"gi-checkout-dot\"></a>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.checkout.html","<div class=\"container\">\n  <gi-cart-stage model=\"model\"></gi-cart-stage>\n  <div class=\"row\">\n    <div class=\"col-md-1\">\n      <div ng-if=\"cart.getStage() > 1\" class=\"btn btn-primary\" ng-click=\"cart.prevStage()\">Prev</div>\n    </div>\n    <div class=\"col-md-1 col-md-offset-10\">\n      <div ng-if=\"cart.getStage() < 4\" class=\"btn btn-primary\" ng-click=\"cart.nextStage()\">Next</div>\n    </div>\n  </div>\n  <div class=\"row small-gap\">\n    <gi-cart ng-if=\"cart.getStage() == 1\" model=\"model\"></gi-cart>\n    <pre ng-if=\"cart.getStage() == 2\">Address capture form to go here</pre>\n    <pre ng-if=\"cart.getStage() == 3\">Stripe Payment form to go here</pre>\n    <pre ng-if=\"cart.getStage() == 4\">Thankyou message to go here</pre>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.countryForm.html","<div ng-form name=\"countryForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"countryName\"\n           ng-model=\"model.selectedItem.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"countryCode\"\n           ng-model=\"model.selectedItem.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label class=\"control-label\">Currency:</label>\n    <ui-select ng-model=\"model.selectedItem.currencyId\">\n      <ui-select-match>{{$select.selected.name}}</ui-select-match>\n      <ui-select-choices repeat=\"c._id as c in model.currencies  | filter: $select.search\">\n        <div ng-bind-html=\"c.name | highlight: $select.search\"></div>\n      </ui-select-choices>\n    </ui-select>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"countryForm.$dirty || model.selectedItem._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"model.selectedItem._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.currencyForm.html","<div ng-form name=\"currencyForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencyName\"\n           ng-model=\"item.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencyCode\"\n           ng-model=\"item.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Symbol:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencSymbol\"\n           ng-model=\"item.symbol\"/>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"currencyForm.$dirty || item._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"item._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.priceForm.html","<div ng-form name=\"priceForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"priceListName\"\n           ng-model=\"model.selectedItem.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Prices:</label>\n    <div ng-repeat=\"(code, price) in model.selectedItem.prices\">\n      <div class=\"input-group\">\n         <div class=\"input-group-addon currency\">{{code}}</div>\n         <input type=\"text\" class=\"form-control\" id=\"exampleInputAmount\" placeholder=\"Amount\" ng-model=\"model.selectedItem.prices[code]\"/>\n         <div class=\"input-group-addon\" ng-click=\"removePriceForCurrency(code)\">  <span class=\"glyphicon glyphicon-trash\" aria-hidden=\"true\"></span></div>\n       </div>\n    </div>\n  </div>\n  <div class=\"form-group\">\n    <div class=\"input-group\">\n      <div class=\"input-group-addon currency\" style=\"\">\n        <ui-select ng-model=\"local.code\">\n           <ui-select-match>{{$select.selected.code}}</ui-select-match>\n           <ui-select-choices repeat=\"c.code as c in model.currencies  | filter: $select.search\">\n             <div ng-bind-html=\"c.code | highlight: $select.search\"></div>\n           </ui-select-choices>\n        </ui-select>\n      </div>\n      <input type=\"text\" class=\"form-control currency-pick\" id=\"exampleInputAmount\" placeholder=\"Enter Amount\" ng-model=\"local.price\"/>\n      <div class=\"input-group-addon\" ng-click=\"savePriceForCurrency(local.code)\">  <span class=\"glyphicon glyphicon-save\" aria-hidden=\"true\"></span></div>\n     </div>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-success btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"priceForm.$dirty || model.selectedItem._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"model.selectedItem._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.summary.html","<div class=\"row\">\n  <div class=\"col-xs-5\">\n    <svg version=\"1.1\"  class=\"icon basket\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"30px\" height=\"30px\" xml:space=\"preserve\">\n      <path d=\"M27.715,10.48l-2.938,6.312c-0.082,0.264-0.477,0.968-1.318,0.968H11.831\n                c-0.89,0-1.479-0.638-1.602-0.904l-2.048-6.524C7.629,8.514,8.715,7.933,9.462,7.933c0.748,0,14.915,0,16.805,0\n                C27.947,7.933,28.17,9.389,27.715,10.48L27.715,10.48z M9.736,9.619c0.01,0.061,0.026,0.137,0.056,0.226l1.742,6.208\n                c0.026,0.017,0.058,0.028,0.089,0.028h11.629l2.92-6.27c0.025-0.073,0.045-0.137,0.053-0.192H9.736L9.736,9.619z M13.544,25.534\n                c-0.819,0-1.482-0.662-1.482-1.482s0.663-1.484,1.482-1.484c0.824,0,1.486,0.664,1.486,1.484S14.369,25.534,13.544,25.534\n                L13.544,25.534z M23.375,25.534c-0.82,0-1.482-0.662-1.482-1.482s0.662-1.484,1.482-1.484c0.822,0,1.486,0.664,1.486,1.484\n                S24.197,25.534,23.375,25.534L23.375,25.534z M24.576,21.575H13.965c-2.274,0-3.179-2.151-3.219-2.244\n                c-0.012-0.024-0.021-0.053-0.028-0.076c0,0-3.56-12.118-3.834-13.05c-0.26-0.881-0.477-1.007-1.146-1.007H2.9\n                c-0.455,0-0.82-0.364-0.82-0.818s0.365-0.82,0.82-0.82h2.841c1.827,0,2.4,1.103,2.715,2.181\n                c0.264,0.898,3.569,12.146,3.821,12.999c0.087,0.188,0.611,1.197,1.688,1.197h10.611c0.451,0,0.818,0.368,0.818,0.818\n                C25.395,21.21,25.027,21.575,24.576,21.575L24.576,21.575z\"/>\n    </svg>\n  </div>\n  <div class=\"col-xs-7\">\n    <span class=\"badge\">{{ giCart.totalItems() }}</span>\n  </div>\n</div>\n");}]);
 angular.module('gi.commerce').directive('giCurrencyForm', [
   '$q', 'giCurrency', function($q, Currency) {
     return {
@@ -255,29 +274,88 @@ angular.module('gi.commerce').directive('giCurrencyForm', [
   }
 ]);
 
-angular.module('gi.commerce').filter('giCurrency', [
-  '$filter', function($filter) {
-    return function(amount, currencySymbol, fractionSize) {
-      if (angular.isFunction(currencySymbol)) {
-        currencySymbol = currencySymbol();
-      }
-      return $filter('currency')(amount, currencySymbol, fractionSize);
-    };
-  }
-]);
-
-angular.module('gi.commerce').filter('giCurrencyId', [
-  'giCurrency', function(Currency) {
-    return function(currencyId) {
-      var cur, result;
-      result = "N/A";
-      if (currencyId != null) {
-        cur = Currency.getCached(currencyId);
-        if (cur != null) {
-          result = cur.symbol + ' ' + cur.code;
+angular.module('gi.commerce').directive('giPriceForm', [
+  '$q', 'giCurrency', 'giPriceList', function($q, Currency, PriceList) {
+    return {
+      restrict: 'E',
+      scope: {
+        submitText: '@',
+        model: '='
+      },
+      templateUrl: 'gi.commerce.priceForm.html',
+      link: {
+        pre: function($scope) {
+          $scope.local = {};
+          $scope.savePriceForCurrency = function(code) {
+            if ($scope.model.selectedItem != null) {
+              if ($scope.model.selectedItem.prices == null) {
+                $scope.model.selectedItem.prices = {};
+              }
+              $scope.model.selectedItem.prices[code] = $scope.local.price;
+              return $scope.local = {};
+            }
+          };
+          $scope.removePriceForCurrency = function(code) {
+            var ref;
+            if (((ref = $scope.model.selectedItem) != null ? ref.prices : void 0) != null) {
+              return delete $scope.model.selectedItem.prices[code];
+            }
+          };
+          $scope.save = function() {
+            return PriceList.save($scope.model.selectedItem).then(function() {
+              var alert;
+              alert = {
+                name: 'price-saved',
+                type: 'success',
+                msg: "Price Saved."
+              };
+              $scope.$emit('event:show-alert', alert);
+              $scope.$emit('price-saved', $scope.model.selectedItem);
+              return $scope.clear();
+            }, function(err) {
+              var alert;
+              alert = {
+                name: 'price-not-saved',
+                type: 'danger',
+                msg: "Failed to save price. " + err.data.error
+              };
+              return $scope.$emit('event:show-alert', alert);
+            });
+          };
+          $scope.clear = function() {
+            $scope.model.selectedItem = {};
+            $scope.priceForm.$setPristine();
+            $scope.confirm = false;
+            return $scope.$emit('price-form-cleared');
+          };
+          return $scope.destroy = function() {
+            if ($scope.confirm) {
+              return PriceList.destroy($scope.model.selectedItem._id).then(function() {
+                var alert;
+                alert = {
+                  name: 'price-deleted',
+                  type: 'success',
+                  msg: 'price Deleted.'
+                };
+                $scope.$emit('event:show-alert', alert);
+                $scope.$emit('price-deleted');
+                return $scope.clear();
+              }, function() {
+                var alert;
+                alert = {
+                  name: "Price not deleted",
+                  msg: "Price not deleted.",
+                  type: "warning"
+                };
+                $scope.$emit('event:show-alert', alert);
+                return $scope.confirm = false;
+              });
+            } else {
+              return $scope.confirm = true;
+            }
+          };
         }
       }
-      return result;
     };
   }
 ]);
@@ -633,7 +711,11 @@ angular.module('gi.commerce').factory('giOrderLine', [
   }
 ]);
 
-
+angular.module('gi.commerce').factory('giPriceList', [
+  'giCrud', function(Crud) {
+    return Crud.factory('priceList');
+  }
+]);
 
 
 /*global angular */
