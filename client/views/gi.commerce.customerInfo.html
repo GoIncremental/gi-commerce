@@ -1,0 +1,35 @@
+<div class="row medium-gap">
+  <div class="col-md-12">
+    <gi-customer-form model="model"><gi-customer-form>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div ng-form name="addressForm" class="form well">
+      <div class="row">
+        <div ng-if="cart.needsShipping()" class="col-md-12">
+          <div class="form-group">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" ng-model="cart.differentShipping"> Ship to different address?
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <gi-address-form-fields item="cart.billingAddress"
+                           title="Please enter your billing address"
+                           prefix="billing">
+          </gi-address-form-fields>
+        </div>
+
+        <div class="col-md-6" ng-if="cart.differentShipping">
+          <gi-address-form-fields item="cart.shippingAddress"
+                           title="Please enter your shipping address"
+                           prefix="shipping">
+          </gi-address-form-fields>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
