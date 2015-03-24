@@ -50,7 +50,7 @@ angular.module('gi.commerce').factory 'giCardType'
   #export the instantiated card types
   visa: visa
   masterCard: masterCard
-  amex: amex
+  americanExpress: amex
   dinersClub: dinersClub
   discover: discover
   jcb: jcb

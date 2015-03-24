@@ -1,9 +1,14 @@
 angular.module('gi.commerce').factory 'giCard'
 , ['giCardType'
 , (CardType) ->
+  cardTypes = CardType
+
+  camelCase = (input) ->
+    input.replace(/\s/g, '-').toLowerCase().replace /-(.)/g, (match, group1) ->
+      group1.toUpperCase()
 
   card =
-    types: CardType
+    types: cardTypes
     parse: (number) ->
       if typeof number isnt 'string'
         ''
@@ -22,7 +27,7 @@ angular.module('gi.commerce').factory 'giCard'
       if not number?
         return false
       len = number.length;
-      if len isnt 16
+      if len < 15
         return false
 
       mul = 0;
@@ -48,8 +53,26 @@ angular.module('gi.commerce').factory 'giCard'
         else
           false
 
+  cvcRegex = /^\d{3,4}$/
+
+  isCvcValid = (cvc, type) ->
+    if (typeof cvc) isnt 'string'
+      false
+    else if not cvcRegex.test(cvc)
+      false
+    else if not type
+      true
+    else
+      camelType = camelCase(type)
+      if cardTypes[camelType]?
+        card.types[camelType].cvcLength is cvc.length
+      else
+        cvc.length is 3
+
 
   card: card
+  cvc:
+    isValid: isCvcValid
   validate: (cardObj) ->
     card:
       type: type(cardObj.number)
@@ -58,4 +81,5 @@ angular.module('gi.commerce').factory 'giCard'
       expirationYear: cardObj.expirationYear
       cvc: cardObj.cvc
     validCardNumber: luhn(cardObj.number)
+    validCvc: isCvcValid(cardObj.cvc),
 ]

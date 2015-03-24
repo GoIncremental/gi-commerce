@@ -44,3 +44,22 @@ angular.module('gi.commerce').directive 'giCcNum'
     linkFn
 ]
 
+angular.module('gi.commerce').directive 'giCcCvc'
+, ['$parse','giCard'
+, ($parse, Card) ->
+  restrict: 'A'
+  require: 'ngModel'
+  compile: (elem, attrs) ->
+    attrs.$set('maxlength', 4)
+    attrs.$set('pattern', '[0-9]*')
+    cvc = Card.cvc
+    linkFn = ($scope, elem, attrs, controller) ->
+      controller.$validators.giCcCvc = (value) ->
+        cvc.isValid value, $parse(attrs.giCcType)($scope)
+
+      $scope.$watch attrs.giCcType, (x) ->
+        controller.$validate()
+        return
+
+    linkFn
+]
