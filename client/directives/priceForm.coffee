@@ -21,6 +21,7 @@ angular.module('gi.commerce').directive 'giPriceForm'
           delete $scope.model.selectedItem.prices[code]
 
       $scope.save = () ->
+        $scope.model.selectedItem.acl = "public-read"
         PriceList.save($scope.model.selectedItem).then () ->
           alert =
             name: 'price-saved'

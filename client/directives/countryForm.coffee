@@ -9,6 +9,7 @@ angular.module('gi.commerce').directive 'giCountryForm'
   link:
     pre: ($scope) ->
       $scope.save = () ->
+        $scope.model.selectedItem.acl = "public-read"
         Country.save($scope.model.selectedItem).then () ->
           alert =
             name: 'country-saved'

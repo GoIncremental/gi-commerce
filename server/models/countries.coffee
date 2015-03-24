@@ -7,6 +7,7 @@ module.exports = (dal) ->
       name: 'String'
       code: 'String'
       currencyId: 'ObjectId'
+      acl: 'String'
 
   modelDefinition.schema = dal.schemaFactory modelDefinition
   model = dal.modelFactory modelDefinition

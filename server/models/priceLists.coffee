@@ -4,6 +4,7 @@ module.exports = (dal) ->
     name: 'PriceList'
     schemaDefinition:
       systemId: 'ObjectId'
+      acl: 'String'
       name: 'String'
       prices: 'Mixed'
 

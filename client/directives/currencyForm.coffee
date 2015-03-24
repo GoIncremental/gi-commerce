@@ -9,6 +9,7 @@ angular.module('gi.commerce').directive 'giCurrencyForm'
   link:
     pre: ($scope) ->
       $scope.save = () ->
+        $scope.item.acl = "public-read"
         Currency.save($scope.item).then () ->
           alert =
             name: 'cohort-saved'
