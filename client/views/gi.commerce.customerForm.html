@@ -1,0 +1,59 @@
+<div ng-form name="customerForm" class="well form">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-group" ng-if="model.me.loggedIn">
+        Hi {{model.me.user.firstName}} welcome back. We will e-mail confirmation of your order to your e-mail address:
+        <strong>{{model.me.user.email}}</strong>
+      </div>
+      <div class="form-group" ng-if="!model.me.loggedIn">
+        Already have an account? <a ng-click="requestLogin()">Please Sign In</a>
+      </div>
+      <div class="form-group">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="cart.business"> Buying for a company?
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6" ng-if="!model.me.loggedIn">
+      <div class="form-group">
+        <label>Name:</label>
+        <input type="text"
+               class="form-control"
+               name="name"
+               ng-model="model.selectedItem.name"/>
+      </div>
+      <div class="form-group">
+        <label>Email:</label>
+        <input type="text"
+               class="form-control"
+               name="email"
+               ng-model="model.selectedItem.email"/>
+      </div>
+      <div class="form-group">
+        <label>Password:</label>
+        <input type="password"
+               class="form-control"
+               name="password"
+               ng-model="model.selectedItem.password"/>
+      </div>
+    </div>
+    <div class="col-md-6" ng-if="cart.business">
+      <div class="form-group" >
+        <label>Company Name:</label>
+        <input type="text"
+               class="form-control"
+               name="countryName"
+               ng-model="cart.companyName"/>
+      </div>
+      <div class="form-group">
+        <label>VAT Number (optional):</label>
+        <input type="text"
+               class="form-control"
+               name="countryName"
+               ng-model="cart.companyVAT"/>
+      </div>
+    </div>
+  </div>
+</div>
