@@ -11,6 +11,7 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 ##Release Notes
 
 v0.5.0
+- Added needsShipping() method to giCart Service (uses the 'physical' boolean property of the item added to carts)
 - Added cart now Calculates price based on Price List entry for item
 - Added giPaymentInfo directive - a validated credit card entry form
 - Added giCcCvc directive to validate credic card cvc numbers

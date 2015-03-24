@@ -71,6 +71,9 @@ angular.module('gi.commerce').factory 'giCartItem'
   item.prototype.getTotal =  (currencyCode) ->
     @getQuantity() * @getPrice(currencyCode)
 
+  item.prototype.needsShipping = () ->
+    @_data.physical
+
   item
 
 ]

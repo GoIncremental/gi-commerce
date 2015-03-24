@@ -96,6 +96,14 @@ angular.module('gi.commerce').factory 'giCart'
       if currency?
         cart.currency = currency
 
+
+  needsShipping: () ->
+    result = false
+    angular.forEach cart.items, (item) ->
+      if item.needsShipping()
+        result = true
+    result
+
   totalItems: () ->
     cart.items.length
 
