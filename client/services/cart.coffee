@@ -13,14 +13,13 @@ angular.module('gi.commerce').factory 'giCart'
   getSubTotal = () ->
     total = 0
     angular.forEach cart.items, (item) ->
-      total += item.getTotal()
+      total += item.getTotal(cart.currency.code)
     total
 
   getShipping = () ->
     if cart.items.length == 0
       return 0
     cart.shipping
-
 
   init = () ->
     cart =
@@ -39,7 +38,7 @@ angular.module('gi.commerce').factory 'giCart'
   #Below are the publicly exported functions
   init: init
 
-  addItem: (id, name, price, quantity, data) ->
+  addItem: (id, name, priceList, quantity, data) ->
 
     inCart = getItemById(id)
 
@@ -47,7 +46,7 @@ angular.module('gi.commerce').factory 'giCart'
       #Update quantity of an item if it's already in the cart
       inCart.setQuantity(quantity, false)
     else
-      newItem = new giCartItem(id, name, price, quantity, data)
+      newItem = new giCartItem(id, name, priceList, quantity, data)
       cart.items.push(newItem)
       $rootScope.$broadcast('giCart:itemAdded', newItem)
 
@@ -88,6 +87,9 @@ angular.module('gi.commerce').factory 'giCart'
   getCurrencySymbol: () ->
     cart.currency.symbol
 
+  getCurrencyCode: () ->
+    cart.currency.code
+
   setCountry: (code) ->
     Currency.getFromCountryCode(code)
     .then (currency) ->
@@ -118,7 +120,7 @@ angular.module('gi.commerce').factory 'giCart'
 
     angular.forEach storedCart.items, (item) ->
       cart.items.push(new giCartItem(
-        item._id,  item._name, item._price, item._quantity, item._data)
+        item._id,  item._name, item._priceList, item._quantity, item._data)
       )
 
     save()

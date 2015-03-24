@@ -2,13 +2,12 @@ angular.module('gi.commerce').factory 'giCartItem'
 , ['$rootScope', 'giLocalStorage'
 , ($rootScope, store) ->
 
-  item = (id, name, price, quantity, data) ->
+  item = (id, name, priceList, quantity,data) ->
     @setId(id)
     @setName(name)
-    @setPrice(price)
+    @setPriceList(priceList)
     @setQuantity(quantity)
     @setData(data)
-
 
   item.prototype.setId = (id) ->
     if (id)
@@ -28,17 +27,15 @@ angular.module('gi.commerce').factory 'giCartItem'
   item.prototype.getName = () ->
     @_name
 
-  item.prototype.setPrice = (price) ->
-    price = parseFloat(price)
-    if (price)
-      if (price <= 0)
-        console.error('A price must be over 0')
-      @_price = (price)
+  item.prototype.setPriceList = (priceList) ->
+    if priceList?
+      @_priceList = priceList
     else
-      console.error('A price must be provided')
+      console.error('A Price List must be provided')
 
-  item.prototype.getPrice = () ->
-    @_price
+  item.prototype.getPrice = (currencyCode) ->
+    if @_priceList?.prices?[currencyCode]?
+      @_priceList.prices[currencyCode]
 
   item.prototype.setQuantity = (quantity, relative) ->
     quantity = parseInt(quantity)
@@ -71,8 +68,8 @@ angular.module('gi.commerce').factory 'giCartItem'
       console.info('This item has no data')
       return
 
-  item.prototype.getTotal =  () ->
-    @getQuantity() * @getPrice()
+  item.prototype.getTotal =  (currencyCode) ->
+    @getQuantity() * @getPrice(currencyCode)
 
   item
 
