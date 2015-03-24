@@ -1,0 +1,43 @@
+<div ng-form name="cardForm" class="well form">
+  <legend>Please enter your card details</legend>
+  <div class="form-group" ng-class="{'has-error': isNumberValidationError(), 'has-success': isNumberValidationSuccess()}">
+    <label class="control-label">Card Number:</label>
+    <div class="input-group">
+      <input type="text"
+           class="form-control"
+           name="cardNumber"
+           ng-model="cart.card.number"
+           gi-cc-num
+           cc-eager-type />
+      <span class="input-group-addon"><i class="fa fa-lg" ng-class="getCreditFont()"></i></span>
+    </div>
+    <p class="control-label" ng-show="isNumberValidationError()">
+      Not a valid card number!
+    </p>
+  </div>
+  <div class="form-group">
+    <label>Expiry Date:</label>
+    <input type="text"
+           class="form-control"
+           name="cardExpiry"
+           ng-model="cart.card.expiry"/>
+  </div>
+  <div class="form-group" ng-class="{'has-error': isSecurityValidationError(), 'has-success': isSecurityValidationSuccess()}">
+    <label>CVC:</label>
+    <div class="input-group">
+      <input type="text"
+             class="form-control"
+             name="cardSecurity"
+             ng-model="cart.card.security"
+             gi-cc-cvc
+             gi-cc-type="cardForm.cardNumber.$giCcType"/>
+      <span class="input-group-addon"><i class="fa fa-lg" ng-class="getCvcFont()"></i></span>
+    </div>
+    <p class="control-label" ng-show="isSecurityValidationError()">
+      Not a valid cvc number!
+    </p>
+
+  </div>
+  <pre>{{cardForm.cardNumber.$giCcType | json}}</pre>
+</div>
+<pre>{{cardForm.cardNumber.$giCcType | json}}</pre>

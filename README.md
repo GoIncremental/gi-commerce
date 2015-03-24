@@ -11,6 +11,7 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 ##Release Notes
 
 v0.5.0
+- Added giPaymentInfo directive - a validated credit card entry form
 - Added giCcCvc directive to validate credic card cvc numbers
 - Added giCcNum directive to validate credit card numbers (luhn etc, uses giCardType)
 - Added giCard service which uses giCardType and gives validation functions etc
