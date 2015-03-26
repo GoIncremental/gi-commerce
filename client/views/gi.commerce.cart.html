@@ -47,8 +47,8 @@
                       ng-click="item.setQuantity(-1, true)"></span>&nbsp;&nbsp;
                 {{ item.getQuantity() | number }}&nbsp;&nbsp;
                 <span class="glyphicon glyphicon-plus" ng-click="item.setQuantity(1, true)"></span></td>
-            <td>{{ item.getPrice(giCart.getCurrencyCode()) | giCurrency:giCart.getCurrencySymbol}}</td>
-            <td>{{ item.getTotal(giCart.getCurrencyCode()) | giCurrency:giCart.getCurrencySymbol }}</td>
+            <td>{{ item.getPrice(giCart.getTerritoryCode()) | giCurrency:giCart.getCurrencySymbol}}</td>
+            <td>{{ item.getTotal(giCart.getTerritoryCode()) | giCurrency:giCart.getCurrencySymbol}}</td>
         </tr>
         </tbody>
     </table>

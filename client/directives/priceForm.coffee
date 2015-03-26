@@ -1,6 +1,6 @@
 angular.module('gi.commerce').directive 'giPriceForm'
-, ['$q', 'giCurrency', 'giPriceList'
-, ($q, Currency, PriceList) ->
+, ['$q', 'giPriceList'
+, ($q, PriceList) ->
   restrict: 'E'
   scope:
     submitText: '@'
@@ -9,14 +9,14 @@ angular.module('gi.commerce').directive 'giPriceForm'
   link:
     pre: ($scope) ->
       $scope.local = {}
-      $scope.savePriceForCurrency = (code) ->
+      $scope.savePriceForTerritory = (code) ->
         if $scope.model.selectedItem?
           if not $scope.model.selectedItem.prices?
             $scope.model.selectedItem.prices = {}
           $scope.model.selectedItem.prices[code] = $scope.local.price
           $scope.local = {}
 
-      $scope.removePriceForCurrency = (code) ->
+      $scope.removePriceForTerritory = (code) ->
         if $scope.model.selectedItem?.prices?
           delete $scope.model.selectedItem.prices[code]
 

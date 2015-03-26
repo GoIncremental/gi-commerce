@@ -33,9 +33,11 @@ angular.module('gi.commerce').factory 'giCartItem'
     else
       console.error('A Price List must be provided')
 
-  item.prototype.getPrice = (currencyCode) ->
-    if @_priceList?.prices?[currencyCode]?
-      @_priceList.prices[currencyCode]
+  item.prototype.getPrice = (territoryCode) ->
+    if @_priceList?.prices?[territoryCode]?
+      @_priceList.prices[territoryCode]
+    else
+      0
 
   item.prototype.setQuantity = (quantity, relative) ->
     quantity = parseInt(quantity)
@@ -68,8 +70,8 @@ angular.module('gi.commerce').factory 'giCartItem'
       console.info('This item has no data')
       return
 
-  item.prototype.getTotal =  (currencyCode) ->
-    @getQuantity() * @getPrice(currencyCode)
+  item.prototype.getTotal =  (territoryCode) ->
+    @getQuantity() * @getPrice(territoryCode)
 
   item.prototype.needsShipping = () ->
     @_data.physical

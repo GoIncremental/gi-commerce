@@ -1,23 +1,23 @@
-<div ng-form name="countryForm" class="well form">
+<div ng-form name="territoryForm" class="well form">
   <div class="form-group">
     <label>Name:</label>
     <input type="text"
            class="form-control"
-           name="countryName"
+           name="territoryName"
            ng-model="model.selectedItem.name"/>
   </div>
   <div class="form-group">
     <label>Code:</label>
     <input type="text"
            class="form-control"
-           name="countryCode"
+           name="territoryCode"
            ng-model="model.selectedItem.code"/>
   </div>
   <div class="form-group">
-    <label class="control-label">Territory:</label>
-    <ui-select ng-model="model.selectedItem.territoryId">
+    <label class="control-label">Currency:</label>
+    <ui-select ng-model="model.selectedItem.currencyId">
       <ui-select-match>{{$select.selected.name}}</ui-select-match>
-      <ui-select-choices repeat="c._id as c in model.territories  | filter: $select.search">
+      <ui-select-choices repeat="c._id as c in model.currencies  | filter: $select.search">
         <div ng-bind-html="c.name | highlight: $select.search"></div>
       </ui-select-choices>
     </ui-select>
@@ -25,7 +25,7 @@
   <div class="form-group">
     <div class="checkbox">
       <label>
-        <input type="checkbox" ng-model="model.selectedItem.default"> Use as Default Country?
+        <input type="checkbox" ng-model="model.selectedItem.default"> Use as Default Territory?
       </label>
     </div>
   </div>

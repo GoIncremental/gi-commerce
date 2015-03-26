@@ -10,24 +10,24 @@
     <label>Prices:</label>
     <div ng-repeat="(code, price) in model.selectedItem.prices">
       <div class="input-group">
-         <div class="input-group-addon currency">{{code}}</div>
+         <div class="input-group-addon territory">{{code}}</div>
          <input type="text" class="form-control" id="exampleInputAmount" placeholder="Amount" ng-model="model.selectedItem.prices[code]"/>
-         <div class="input-group-addon" ng-click="removePriceForCurrency(code)">  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></div>
+         <div class="input-group-addon" ng-click="removePriceForTerritory(code)">  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span></div>
        </div>
     </div>
   </div>
   <div class="form-group">
     <div class="input-group">
-      <div class="input-group-addon currency" style="">
+      <div class="input-group-addon territory" style="">
         <ui-select ng-model="local.code">
            <ui-select-match>{{$select.selected.code}}</ui-select-match>
-           <ui-select-choices repeat="c.code as c in model.currencies  | filter: $select.search">
+           <ui-select-choices repeat="c.code as c in model.territories  | filter: $select.search">
              <div ng-bind-html="c.code | highlight: $select.search"></div>
            </ui-select-choices>
         </ui-select>
       </div>
-      <input type="text" class="form-control currency-pick" id="exampleInputAmount" placeholder="Enter Amount" ng-model="local.price"/>
-      <div class="input-group-addon" ng-click="savePriceForCurrency(local.code)">  <span class="glyphicon glyphicon-save" aria-hidden="true"></span></div>
+      <input type="text" class="form-control territory-pick" id="exampleInputAmount" placeholder="Enter Amount" ng-model="local.price"/>
+      <div class="input-group-addon" ng-click="savePriceForTerritory(local.code)">  <span class="glyphicon glyphicon-save" aria-hidden="true"></span></div>
      </div>
   </div>
   <div class="form-group">

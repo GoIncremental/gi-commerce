@@ -1,12 +1,12 @@
 module.exports = (dal) ->
 
   modelDefinition =
-    name: 'Country'
+    name: 'Territory'
     schemaDefinition:
       systemId: 'ObjectId'
       name: 'String'
       code: 'String'
-      territoryId: 'ObjectId'
+      currencyId: 'ObjectId'
       acl: 'String'
       default: 'Boolean'
 
