@@ -1,7 +1,7 @@
 module.exports = (dal) ->
 
   modelDefinition =
-    name: 'Territory'
+    name: 'Market'
     schemaDefinition:
       systemId: 'ObjectId'
       name: 'String'

@@ -33,9 +33,9 @@ angular.module('gi.commerce').factory 'giCartItem'
     else
       console.error('A Price List must be provided')
 
-  item.prototype.getPrice = (territoryCode) ->
-    if @_priceList?.prices?[territoryCode]?
-      @_priceList.prices[territoryCode]
+  item.prototype.getPrice = (marketCode) ->
+    if @_priceList?.prices?[marketCode]?
+      @_priceList.prices[marketCode]
     else
       0
 
@@ -70,8 +70,8 @@ angular.module('gi.commerce').factory 'giCartItem'
       console.info('This item has no data')
       return
 
-  item.prototype.getTotal =  (territoryCode) ->
-    @getQuantity() * @getPrice(territoryCode)
+  item.prototype.getTotal =  (marketCode) ->
+    @getQuantity() * @getPrice(marketCode)
 
   item.prototype.needsShipping = () ->
     @_data.physical

@@ -1,5 +1,5 @@
-angular.module('gi.commerce').filter 'giTerritoryId'
-, [ 'giTerritory'
+angular.module('gi.commerce').filter 'giMarketId'
+, [ 'giMarket'
 , (Model) ->
   (id) ->
     result = "N/A"

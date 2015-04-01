@@ -1,7 +1,7 @@
 angular.module('gi.commerce').factory 'giCart'
 , ['$rootScope', 'giCartItem', 'giLocalStorage', 'giCountry'
-, 'giCurrency', 'giPayment', 'giTerritory'
-, ($rootScope, giCartItem, store, Country, Currency, Payment, Territory) ->
+, 'giCurrency', 'giPayment', 'giMarket'
+, ($rootScope, giCartItem, store, Country, Currency, Payment, Market) ->
   cart = {}
 
   getItemById = (itemId) ->
@@ -14,7 +14,7 @@ angular.module('gi.commerce').factory 'giCart'
   getSubTotal = () ->
     total = 0
     angular.forEach cart.items, (item) ->
-      total += item.getTotal(cart.territory.code)
+      total += item.getTotal(cart.market.code)
     total
 
   init = () ->
@@ -27,7 +27,7 @@ angular.module('gi.commerce').factory 'giCart'
       currency:
         code: 'GBP'
         symbol: '£'
-      territory:
+      market:
         code: 'UK'
     return
 
@@ -90,19 +90,19 @@ angular.module('gi.commerce').factory 'giCart'
   getCountryCode: () ->
     cart.country.code
 
-  getTerritoryCode: () ->
-    cart.territory.code
+  getMerketCode: () ->
+    cart.market.code
 
   setCountry: (code) ->
     Currency.all().then () ->
-      Territory.all()
-      .then (territories) ->
+      Market.all()
+      .then (markets) ->
         Country.getFromCode(code)
         .then (country) ->
           if country?
             cart.country = country
-            cart.territory = Territory.getCached(cart.country.territoryId)
-            cart.currency = Currency.getCached(cart.territory.currencyId)
+            cart.market = Market.getCached(cart.country.marketId)
+            cart.currency = Currency.getCached(cart.market.currencyId)
 
   needsShipping: () ->
     result = false

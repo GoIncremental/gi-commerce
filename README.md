@@ -10,7 +10,7 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 
 ##Release Notes
 v0.5.1
-- Added support for pricing by territory
+- Added support for pricing by market
 
 v0.5.0
 - Added needsShipping() method to giCart Service (uses the 'physical' boolean property of the item added to carts)

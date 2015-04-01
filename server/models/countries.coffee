@@ -6,7 +6,7 @@ module.exports = (dal) ->
       systemId: 'ObjectId'
       name: 'String'
       code: 'String'
-      territoryId: 'ObjectId'
+      marketId: 'ObjectId'
       acl: 'String'
       default: 'Boolean'
 

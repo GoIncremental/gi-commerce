@@ -9,14 +9,14 @@ angular.module('gi.commerce').directive 'giPriceForm'
   link:
     pre: ($scope) ->
       $scope.local = {}
-      $scope.savePriceForTerritory = (code) ->
+      $scope.savePriceForMarket = (code) ->
         if $scope.model.selectedItem?
           if not $scope.model.selectedItem.prices?
             $scope.model.selectedItem.prices = {}
           $scope.model.selectedItem.prices[code] = $scope.local.price
           $scope.local = {}
 
-      $scope.removePriceForTerritory = (code) ->
+      $scope.removePriceForMarket = (code) ->
         if $scope.model.selectedItem?.prices?
           delete $scope.model.selectedItem.prices[code]
 

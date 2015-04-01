@@ -4,4 +4,4 @@ module.exports = (app) ->
   priceList:    conFac app.models.priceLists
   currency:     conFac app.models.currencies
   country:      conFac app.models.countries
-  territory:    conFac app.models.territories
+  market:    conFac app.models.markets

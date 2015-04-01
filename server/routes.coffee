@@ -17,7 +17,7 @@ configure = (app, rest) ->
   rest.routeResource 'country', app
   , app.middleware.publicReadAction, app.controllers.country
 
-  rest.routeResource 'territory', app
-  , app.middleware.publicReadAction, app.controllers.territory
+  rest.routeResource 'market', app
+  , app.middleware.publicReadAction, app.controllers.market
 
 exports.configure = configure

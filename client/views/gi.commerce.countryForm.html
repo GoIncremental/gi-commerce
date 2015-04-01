@@ -14,10 +14,10 @@
            ng-model="model.selectedItem.code"/>
   </div>
   <div class="form-group">
-    <label class="control-label">Territory:</label>
-    <ui-select ng-model="model.selectedItem.territoryId">
+    <label class="control-label">Market:</label>
+    <ui-select ng-model="model.selectedItem.marketId">
       <ui-select-match>{{$select.selected.name}}</ui-select-match>
-      <ui-select-choices repeat="c._id as c in model.territories  | filter: $select.search">
+      <ui-select-choices repeat="c._id as c in model.markets  | filter: $select.search">
         <div ng-bind-html="c.name | highlight: $select.search"></div>
       </ui-select-choices>
     </ui-select>
