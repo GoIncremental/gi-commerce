@@ -9,7 +9,8 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
-- Added gi-cc-exp directive to validate credit card expiry date 
+- Added context to checkout 'Next' button allowing checkout stages to declare themselves valid, and stop progression if not valid.
+- Added gi-cc-exp directive to validate credit card expiry date
 v0.5.1
 - Added support for pricing by market
 

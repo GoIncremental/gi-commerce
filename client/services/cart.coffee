@@ -22,6 +22,7 @@ angular.module('gi.commerce').factory 'giCart'
       tax : 0
       items : []
       stage: 1
+      validStages: {}
       country:
         code: 'GB'
       currency:
@@ -80,6 +81,15 @@ angular.module('gi.commerce').factory 'giCart'
   setStage: (stage) ->
     if stage > 0 and stage < 4
       cart.stage = stage
+
+  setStageValidity: (stage, valid) ->
+    cart.validStages[stage] = valid
+
+  isStageInvalid: (stage) ->
+    if cart.validStages[stage]?
+      not cart.validStages[stage]
+    else
+      true
 
   getCurrencySymbol: () ->
     cart.currency.symbol

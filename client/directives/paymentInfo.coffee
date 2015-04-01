@@ -5,6 +5,7 @@ angular.module('gi.commerce').directive 'giPaymentInfo'
   templateUrl: 'gi.commerce.paymentInfo.html'
   scope:
     model: '='
+    stage: '@'
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
 
@@ -35,4 +36,8 @@ angular.module('gi.commerce').directive 'giPaymentInfo'
 
     $scope.isPayNowEnabled = () ->
       $scope.cardForm.$valid
+
+    $scope.$watch 'cardForm.$valid', (valid) ->
+      $scope.cart.setStageValidity($scope.stage, valid)
+
 ]
