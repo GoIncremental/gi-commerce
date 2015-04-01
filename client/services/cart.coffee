@@ -90,7 +90,7 @@ angular.module('gi.commerce').factory 'giCart'
   getCountryCode: () ->
     cart.country.code
 
-  getMerketCode: () ->
+  getMarketCode: () ->
     cart.market.code
 
   setCountry: (code) ->

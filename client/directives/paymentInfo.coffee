@@ -14,33 +14,24 @@ angular.module('gi.commerce').directive 'giPaymentInfo'
         when "MasterCard" then "fa-cc-mastercard"
         else "fa-credit-card"
 
-    $scope.getCvcFont = () ->
-      if $scope.cardForm.cardSecurity.$touched
-        if $scope.cardForm.cardSecurity.$invalid
+    $scope.getPropertyFont = (prop) ->
+      if $scope.cardForm[prop].$touched
+        if $scope.cardForm[prop].$invalid
           "fa-exclamation-circle"
         else
           "fa-check-circle"
       else
-        ""
-    $scope.isNumberValidationError = () ->
-      $scope.cardForm.cardNumber.$invalid and
-      $scope.cardForm.cardNumber.$touched and
-      $scope.cardForm.cardNumber.$dirty
+          ""
 
-    $scope.isNumberValidationSuccess = () ->
-      $scope.cardForm.cardNumber.$valid and
-      $scope.cardForm.cardNumber.$touched and
-      $scope.cardForm.cardNumber.$dirty
+    $scope.isPropertyValidationError = (prop) ->
+      $scope.cardForm[prop].$invalid and
+      $scope.cardForm[prop].$touched and
+      $scope.cardForm[prop].$dirty
 
-    $scope.isSecurityValidationError = () ->
-      $scope.cardForm.cardSecurity.$invalid and
-      $scope.cardForm.cardSecurity.$touched and
-      $scope.cardForm.cardSecurity.$dirty
-
-    $scope.isSecurityValidationSuccess = () ->
-      $scope.cardForm.cardSecurity.$valid and
-      $scope.cardForm.cardSecurity.$touched and
-      $scope.cardForm.cardSecurity.$dirty
+    $scope.isPropertyValidationSuccess = (prop) ->
+      $scope.cardForm[prop].$valid and
+      $scope.cardForm[prop].$touched and
+      $scope.cardForm[prop].$dirty
 
     $scope.isPayNowEnabled = () ->
       $scope.cardForm.$valid

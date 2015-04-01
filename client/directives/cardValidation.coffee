@@ -33,11 +33,39 @@ angular.module('gi.commerce').directive 'giCcNum'
         card.parse number
 
       ngModelController.$validators.giCcNumber = (number) ->
-        result = card.isValid number
-        result
+        card.isValid number
 
       ngModelController.$validators.giCcNumberType = (number) ->
         card.isValid number, $parse(attrs.giCcType)($scope)
+
+
+    #return the linking function
+    linkFn
+]
+
+angular.module('gi.commerce').directive 'giCcExp'
+, ['$parse'
+, ($parse) ->
+  restrict: 'A'
+  require: 'ngModel'
+  compile: (elem, attrs) ->
+    attrs.$set 'pattern', '[0-9]*'
+
+    linkFn = ($scope, elem, attrs, controller) ->
+      ngModelController = controller
+
+      $viewValue = () ->
+        ngModelController.$viewValue
+
+      ngModelController.$validators.giCcExp = (x) ->
+        exp = /^(0[1-9]|1[0-2])\/?(?:20)?([0-9]{2})$/
+        match = exp.exec(x)
+        if match?
+          date = moment.utc()
+          givenExpiry = moment.utc(match[1] + '-' + match[2], "MM-YY").endOf('Month')
+          date.isBefore(givenExpiry)
+        else
+          false
 
 
     #return the linking function
