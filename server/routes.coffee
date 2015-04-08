@@ -20,4 +20,7 @@ configure = (app, rest) ->
   rest.routeResource 'market', app
   , app.middleware.publicReadAction, app.controllers.market
 
+  app.get '/api/taxRate', app.middleware.publicAction
+  , app.controllers.quaderno.getTaxRate
+
 exports.configure = configure
