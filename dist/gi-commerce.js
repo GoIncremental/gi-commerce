@@ -11,6 +11,49 @@ angular.module('gi.commerce', ['gi.util']).value('version', '0.2.0').run([
   }
 ]);
 
+angular.module('gi.commerce').filter('giCurrency', [
+  '$filter', function($filter) {
+    return function(amount, currencySymbol, fractionSize) {
+      if (angular.isFunction(currencySymbol)) {
+        currencySymbol = currencySymbol();
+      }
+      return $filter('currency')(amount, currencySymbol, fractionSize);
+    };
+  }
+]);
+
+angular.module('gi.commerce').filter('giCurrencyId', [
+  'giCurrency', function(Currency) {
+    return function(currencyId) {
+      var cur, result;
+      result = "N/A";
+      if (currencyId != null) {
+        cur = Currency.getCached(currencyId);
+        if (cur != null) {
+          result = cur.symbol + ' ' + cur.code;
+        }
+      }
+      return result;
+    };
+  }
+]);
+
+angular.module('gi.commerce').filter('giMarketId', [
+  'giMarket', function(Model) {
+    return function(id) {
+      var cur, result;
+      result = "N/A";
+      if (id != null) {
+        cur = Model.getCached(id);
+        if (cur != null) {
+          result = cur.code;
+        }
+      }
+      return result;
+    };
+  }
+]);
+
 angular.module('gi.commerce').directive('giAddToCart', [
   'giCart', function(giCart) {
     return {
@@ -90,12 +133,43 @@ angular.module('gi.commerce').directive('giCcNum', [
             return card.parse(number);
           });
           ngModelController.$validators.giCcNumber = function(number) {
-            var result;
-            result = card.isValid(number);
-            return result;
+            return card.isValid(number);
           };
           return ngModelController.$validators.giCcNumberType = function(number) {
             return card.isValid(number, $parse(attrs.giCcType)($scope));
+          };
+        };
+        return linkFn;
+      }
+    };
+  }
+]);
+
+angular.module('gi.commerce').directive('giCcExp', [
+  '$parse', function($parse) {
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      compile: function(elem, attrs) {
+        var linkFn;
+        attrs.$set('pattern', '[0-9]*');
+        linkFn = function($scope, elem, attrs, controller) {
+          var $viewValue, ngModelController;
+          ngModelController = controller;
+          $viewValue = function() {
+            return ngModelController.$viewValue;
+          };
+          return ngModelController.$validators.giCcExp = function(x) {
+            var date, exp, givenExpiry, match;
+            exp = /^(0[1-9]|1[0-2])\/?(?:20)?([0-9]{2})$/;
+            match = exp.exec(x);
+            if (match != null) {
+              date = moment.utc();
+              givenExpiry = moment.utc(match[1] + '-' + match[2], "MM-YY").endOf('Month');
+              return date.isBefore(givenExpiry);
+            } else {
+              return false;
+            }
           };
         };
         return linkFn;
@@ -132,10 +206,17 @@ angular.module('gi.commerce').directive('giCart', [
   'giCart', function(giCart) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        stage: '@'
+      },
       templateUrl: 'gi.commerce.cart.html',
       link: function($scope, element, attrs) {
-        return $scope.giCart = giCart;
+        $scope.giCart = giCart;
+        return $scope.$watch('giCart.totalItems()', function(numItems) {
+          var valid;
+          valid = numItems > 0;
+          return $scope.giCart.setStageValidity($scope.stage, valid);
+        });
       }
     };
   }
@@ -184,7 +265,14 @@ angular.module('gi.commerce').directive('giCheckout', [
       },
       templateUrl: 'gi.commerce.checkout.html',
       link: function($scope, element, attrs) {
-        return $scope.cart = giCart;
+        $scope.cart = giCart;
+        return $scope.$watch('cart.getStage()', function(newVal) {
+          if (newVal != null) {
+            if (newVal === 3) {
+              return $scope.cart.calculateTaxRate();
+            }
+          }
+        });
       }
     };
   }
@@ -333,7 +421,7 @@ angular.module('gi.commerce').directive('giCurrencyForm', [
 ]);
 
 angular.module('gi.commerce').directive('giCustomerForm', [
-  '$q', 'giCurrency', function($q, Currency) {
+  '$q', 'giCurrency', 'giCart', function($q, Currency, Cart) {
     return {
       restrict: 'E',
       scope: {
@@ -343,9 +431,15 @@ angular.module('gi.commerce').directive('giCustomerForm', [
       },
       templateUrl: 'gi.commerce.customerForm.html',
       link: function($scope, elem, attrs) {
-        return $scope.requestLogin = function() {
+        $scope.cart = Cart;
+        $scope.requestLogin = function() {
           return $scope.$emit('event:show-login');
         };
+        return $scope.$watch('model.me', function(me) {
+          if ((me != null ? me.user : void 0) != null) {
+            return Cart.setCustomer(me.user);
+          }
+        });
       }
     };
   }
@@ -357,8 +451,46 @@ angular.module('gi.commerce').directive('giCustomerInfo', [
       restrict: 'E',
       templateUrl: 'gi.commerce.customerInfo.html',
       scope: {
-        model: '='
+        model: '=',
+        stage: '@'
       },
+      link: function($scope, elem, attrs) {
+        $scope.cart = Cart;
+        return $scope.$watch('stage', function(newVal) {
+          if (newVal != null) {
+            return $scope.cart.setStageValidity(newVal, true);
+          }
+        });
+      }
+    };
+  }
+]);
+
+angular.module("gi.commerce").run(["$templateCache", function($templateCache) {$templateCache.put("gi.commerce.addressFormFields.html","<legend>{{title}}</legend>\n<div class=\"form-group\">\n  <label>Address Line 1:</label>\n  <input type=\"text\"\n         class=\"form-control\"\n         name=\"{{prefix}}-line1\"\n         ng-model=\"item.line1\"/>\n</div>\n<div class=\"form-group\">\n  <label>Address Line 2:</label>\n  <input type=\"text\"\n         class=\"form-control\"\n         name=\"{{prefix}}-line2\"\n         ng-model=\"item.line2\"/>\n</div>\n<div class=\"form-group\">\n  <label>City:</label>\n  <input type=\"text\"\n         class=\"form-control\"\n         name=\"{{prefix}}-city\"\n         ng-model=\"item.city\"/>\n</div>\n<div class=\"form-group\">\n  <label>State:</label>\n  <input type=\"text\"\n         class=\"form-control\"\n         name=\"{{prefix}}-state\"\n         ng-model=\"item.state\"/>\n</div>\n<div class=\"form-group\">\n  <label>Post / Zip Code:</label>\n  <input type=\"text\"\n         class=\"form-control\"\n         name=\"{{prefix}}-code\"\n         ng-model=\"item.code\"/>\n</div>\n<div class=\"form-group\">\n  <label class=\"control-label\">Country:</label>\n  <ui-select ng-model=\"item.country\">\n    <ui-select-match>{{$select.selected.name}}</ui-select-match>\n    <ui-select-choices repeat=\"t in model.countries  | filter: $select.search\">\n      <div ng-bind-html=\"t.name | highlight: $select.search\"></div>\n    </ui-select-choices>\n  </ui-select>\n</div>\n");
+$templateCache.put("gi.commerce.addtocart.html","<div ng-hide=\"attrs.id\">\n    <a class=\"btn btn-lg btn-primary\" ng-disabled=\"true\" ng-transclude></a>\n</div>\n<div ng-show=\"attrs.id\">\n    <div ng-hide=\"inCart()\">\n        <a class=\"btn btn-lg btn-primary\"\n           ng-click=\"addItem(item)\"\n           ng-transclude></a>\n    </div>\n    <div class=\"alert alert-info\"  ng-show=\"inCart()\">\n        This item is in your cart\n    </div>\n</div>\n");
+$templateCache.put("gi.commerce.cart.html","<div class=\"row\">\n  <div class=\"col-xs-12\" ng-show=\"giCart.totalItems() === 0\">\n      Your cart is empty\n  </div>\n  <div class=\"col-xs-12\">\n    <div class=\"table-responsive \" ng-show=\"giCart.totalItems() > 0\">\n\n        <table class=\"table table-striped giCart cart\">\n            <thead>\n            <tr>\n                <th></th>\n                <th></th>\n                <th>Quantity</th>\n                <th>SubTotal</th>\n                <th>Tax</th>\n                <th>Total</th>\n            </tr>\n            </thead>\n            <tfoot>\n            <tr ng-show=\"giCart.getShipping()\">\n                <th></th>\n                <th></th>\n                <th></th>\n                <th></th>\n                <th>Shipping:</th>\n                <th>{{ giCart.getShipping() | giCurrency:giCart.getCurrencySymbol }}</th>\n            </tr>\n            <tr ng-show=\"giCart.getTaxRate() >= 0\">\n                <th></th>\n                <th></th>\n                <th></th>\n                <th></th>\n                <th>Tax:</th>\n                <th>{{ giCart.getTaxTotal() | giCurrency:giCart.getCurrencySymbol }}</th>\n            </tr>\n            <tr>\n                <th></th>\n                <th></th>\n                <th></th>\n                <th></th>\n                <th>Total:</th>\n                <th>{{ giCart.totalCost() | giCurrency:giCart.getCurrencySymbol }}</th>\n            </tr>\n            </tfoot>\n            <tbody>\n            <tr ng-repeat=\"item in giCart.getItems() track by $index\">\n                <td><span ng-click=\"giCart.removeItem($index)\" class=\"glyphicon glyphicon-remove\"></span></td>\n                <td>{{ item.getName() }}</td>\n                <td><span class=\"glyphicon glyphicon-minus\" ng-class=\"{\'disabled\':item.getQuantity()==1}\"\n                          ng-click=\"item.setQuantity(-1, true)\"></span>&nbsp;&nbsp;\n                    {{ item.getQuantity() | number }}&nbsp;&nbsp;\n                    <span class=\"glyphicon glyphicon-plus\" ng-click=\"item.setQuantity(1, true)\"></span></td>\n                <td>{{ item.getSubTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</td>\n                <td>{{ item.getTaxTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</td>\n                <td>{{ item.getTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</td>\n            </tr>\n            </tbody>\n        </table>\n    </div>\n  </div>\n</div>\n<style>\n    .giCart.cart span[ng-click] {\n        cursor: pointer;\n    }\n    .giCart.cart .glyphicon.disabled {\n        color:#aaa;\n    }\n</style>\n");
+$templateCache.put("gi.commerce.cartStage.html","<div class=\"row gi-checkout\" style=\"border-bottom:0;\">\n  <div class=\"col-xs-3 gi-checkout-stage\"\n       ng-class=\"{complete: cart.getStage()>1, active: cart.getStage()==1}\">\n    <div class=\"text-center gi-checkout-stagenum\">Review Cart</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(1)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n    ng-class=\"{complete: cart.getStage()>2, active: cart.getStage()==2, disabled: cart.getStage()<2}\">\n    <div class=\"text-center gi-checkout-stagenum\">Your Details</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(2)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n    ng-class=\"{complete: cart.getStage()>3, active: cart.getStage()==3, disabled: cart.getStage()<3}\">\n    <div class=\"text-center gi-checkout-stagenum\">Payment</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(3)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n       ng-class=\"{complete: cart.getStage()>4, active: cart.getStage()==4, disabled: cart.getStage()<4}\">\n    <div class=\"text-center gi-checkout-stagenum\">Complete</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(4)\" class=\"gi-checkout-dot\"></a>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.checkout.html","<div class=\"container\">\n  <gi-cart-stage model=\"model\"></gi-cart-stage>\n  <div class=\"small-gap\">\n    <gi-cart ng-if=\"cart.getStage() == 1\" model=\"model\" stage=\"1\"></gi-cart>\n    <gi-customer-info ng-if=\"cart.getStage() == 2\" model=\"model\" stage=\"2\">\n    </gi-customer-info>\n    <div ng-if=\"cart.getStage() == 3\" >\n      <gi-payment-info stage=\"3\"></gi-payment-info>\n      <gi-order-summary></gi-order-summary>\n\n    </div>\n    <pre ng-if=\"cart.getStage() == 4\">Thankyou message to go here</pre>\n  </div>\n  <div class=\"row\">\n    <div class=\"col-xs-6\">\n      <div ng-if=\"cart.getStage() > 1\" class=\"btn btn-primary\"\n           ng-click=\"cart.prevStage()\">Prev</div>\n    </div>\n    <div class=\"col-xs-6\">\n      <div class=\"pull-right\">\n        <div ng-if=\"cart.getStage() < 3\" class=\"btn btn-primary\"\n             ng-click=\"cart.nextStage()\"\n             ng-disabled=\"cart.isStageInvalid(cart.getStage())\"\n             >Next</div>\n        <div ng-if=\"cart.getStage() == 3\" class=\"btn btn-primary\"\n             ng-click=\"cart.payNow()\"  ng-disabled=\"cart.isStageInvalid(cart.getStage())\">Pay Now</div>\n      </div>\n    </div>\n  </div>\n  <div class=\"row medium-gap\">\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.countryForm.html","<div ng-form name=\"countryForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"countryName\"\n           ng-model=\"model.selectedItem.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"countryCode\"\n           ng-model=\"model.selectedItem.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label class=\"control-label\">Market:</label>\n    <ui-select ng-model=\"model.selectedItem.marketId\">\n      <ui-select-match>{{$select.selected.name}}</ui-select-match>\n      <ui-select-choices repeat=\"c._id as c in model.markets  | filter: $select.search\">\n        <div ng-bind-html=\"c.name | highlight: $select.search\"></div>\n      </ui-select-choices>\n    </ui-select>\n  </div>\n  <div class=\"form-group\">\n    <div class=\"checkbox\">\n      <label>\n        <input type=\"checkbox\" ng-model=\"model.selectedItem.default\"> Use as Default Country?\n      </label>\n    </div>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"countryForm.$dirty || model.selectedItem._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"model.selectedItem._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.currencyForm.html","<div ng-form name=\"currencyForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencyName\"\n           ng-model=\"item.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencyCode\"\n           ng-model=\"item.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Symbol:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencSymbol\"\n           ng-model=\"item.symbol\"/>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"currencyForm.$dirty || item._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"item._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.customerForm.html","<div ng-form name=\"customerForm\" class=\"well form\">\n  <div class=\"row\">\n    <div class=\"col-md-12\">\n      <div class=\"form-group\" ng-if=\"model.me.loggedIn\">\n        Hi {{model.me.user.firstName}} welcome back. We will e-mail confirmation of your order to your e-mail address:\n        <strong>{{model.me.user.email}}</strong>\n      </div>\n      <div class=\"form-group\" ng-if=\"!model.me.loggedIn\">\n        Already have an account? <a ng-click=\"requestLogin()\">Please Sign In</a>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"checkbox\">\n          <label>\n            <input type=\"checkbox\" ng-model=\"cart.business\"> Buying for a company?\n          </label>\n        </div>\n      </div>\n    </div>\n    <div class=\"col-md-6\" ng-if=\"!model.me.loggedIn\">\n      <div class=\"form-group\">\n        <label>Name:</label>\n        <input type=\"text\"\n               class=\"form-control\"\n               name=\"name\"\n               ng-model=\"model.selectedItem.name\"/>\n      </div>\n      <div class=\"form-group\">\n        <label>Email:</label>\n        <input type=\"text\"\n               class=\"form-control\"\n               name=\"email\"\n               ng-model=\"model.selectedItem.email\"/>\n      </div>\n      <div class=\"form-group\">\n        <label>Password:</label>\n        <input type=\"password\"\n               class=\"form-control\"\n               name=\"password\"\n               ng-model=\"model.selectedItem.password\"/>\n      </div>\n    </div>\n    <div class=\"col-md-6\" ng-if=\"cart.business\">\n      <div class=\"form-group\" >\n        <label>Company Name:</label>\n        <input type=\"text\"\n               class=\"form-control\"\n               name=\"countryName\"\n               ng-model=\"cart.company.Name\"/>\n      </div>\n      <div class=\"form-group\">\n        <label>VAT Number (optional):</label>\n        <input type=\"text\"\n               class=\"form-control\"\n               name=\"countryName\"\n               ng-model=\"cart.company.VAT\"/>\n      </div>\n    </div>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.customerInfo.html","<div class=\"row medium-gap\">\n  <div class=\"col-md-12\">\n    <gi-customer-form model=\"model\"><gi-customer-form>\n  </div>\n</div>\n<div class=\"row\">\n  <div class=\"col-md-12\">\n    <div ng-form name=\"addressForm\" class=\"form well\">\n      <div class=\"row\">\n        <div ng-if=\"cart.needsShipping()\" class=\"col-md-12\">\n          <div class=\"form-group\">\n            <div class=\"checkbox\">\n              <label>\n                <input type=\"checkbox\" ng-model=\"cart.differentShipping\"> Ship to different address?\n              </label>\n            </div>\n          </div>\n        </div>\n        <div class=\"col-md-6\">\n          <gi-address-form-fields item=\"cart.billingAddress\"\n                           title=\"Please enter your billing address\"\n                           prefix=\"billing\">\n          </gi-address-form-fields>\n        </div>\n\n        <div class=\"col-md-6\" ng-if=\"cart.differentShipping\">\n          <gi-address-form-fields item=\"cart.shippingAddress\"\n                           title=\"Please enter your shipping address\"\n                           prefix=\"shipping\">\n          </gi-address-form-fields>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.marketForm.html","<div ng-form name=\"marketForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"marketName\"\n           ng-model=\"model.selectedItem.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"marketCode\"\n           ng-model=\"model.selectedItem.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label class=\"control-label\">Currency:</label>\n    <ui-select ng-model=\"model.selectedItem.currencyId\">\n      <ui-select-match>{{$select.selected.name}}</ui-select-match>\n      <ui-select-choices repeat=\"c._id as c in model.currencies  | filter: $select.search\">\n        <div ng-bind-html=\"c.name | highlight: $select.search\"></div>\n      </ui-select-choices>\n    </ui-select>\n  </div>\n  <div class=\"form-group\">\n    <div class=\"checkbox\">\n      <label>\n        <input type=\"checkbox\" ng-model=\"model.selectedItem.default\"> Use as Default Market?\n      </label>\n    </div>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"countryForm.$dirty || model.selectedItem._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"model.selectedItem._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.orderSummary.html","<div class = \"well\">\n  <div class=\"row\">\n    <div class=\"col-md-12\">\n      Sub Total:  {{ cart.getSubTotal() | giCurrency:cart.getCurrencySymbol }}\n    </div>\n    <div class=\"col-md-12\">\n      Tax: {{cart.getTaxRate() }}% : {{ cart.getTaxTotal() | giCurrency:cart.getCurrencySymbol }}\n    </div>\n    <div class=\"col-md-12\">\n      Total Cost: {{ cart.totalCost() | giCurrency:cart.getCurrencySymbol }}\n    </div>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.paymentInfo.html","<div class=\"row\">\n  <div class=\"col-xs-12\">\n    <div ng-form name=\"cardForm\" class=\"well form\">\n      <legend>Please enter your card details</legend>\n      <div class=\"form-group\" ng-class=\"{\'has-error\': isPropertyValidationError(\'cardNumber\'), \'has-success\': isPropertyValidationSuccess(\'cardNumber\')}\">\n        <label class=\"control-label\">Card Number:</label>\n        <div class=\"input-group\">\n          <input type=\"text\"\n               class=\"form-control\"\n               name=\"cardNumber\"\n               ng-model=\"cart.card.number\"\n               placeholder=\"Card Number\"\n               gi-cc-num\n               cc-eager-type />\n          <span class=\"input-group-addon\"><i class=\"fa fa-lg\" ng-class=\"getCreditFont()\"></i></span>\n        </div>\n        <p class=\"control-label\" ng-show=\"isPropertyValidationError(\'cardNumber\')\">\n          Not a valid card number!\n        </p>\n      </div>\n      <div class=\"form-group\" ng-class=\"{\'has-error\': isPropertyValidationError(\'cardExpiry\'), \'has-success\': isPropertyValidationSuccess(\'cardExpiry\')}\">\n        <label class=\"control-label\">Expiry Date:</label>\n        <div class=\"input-group\">\n          <input type=\"text\"\n                 class=\"form-control\"\n                 name=\"cardExpiry\"\n                 placeholder=\"MM/YY\"\n                 ng-model=\"cart.card.expiry\"\n                 gi-cc-exp />\n          <span class=\"input-group-addon\"><i class=\"fa fa-lg\" ng-class=\"getPropertyFont(\'cardExpiry\')\"></i></span>\n        </div>\n        <p class=\"control-label\" ng-show=\"isPropertyValidationError(\'cardExpiry\')\">\n          Not a valid expiry date!\n        </p>\n      </div>\n      <div class=\"form-group\"  ng-class=\"{\'has-error\': isPropertyValidationError(\'cardSecurity\'), \'has-success\': isPropertyValidationSuccess(\'cardSecurity\')}\">\n        <label class=\"control-label\">CVC:</label>\n        <div class=\"input-group\">\n          <input type=\"text\"\n                 class=\"form-control\"\n                 name=\"cardSecurity\"\n                 ng-model=\"cart.card.security\"\n                 placeholder=\"CVC\"\n                 gi-cc-cvc\n                 gi-cc-type=\"cardForm.cardNumber.$giCcType\"/>\n          <span class=\"input-group-addon\"><i class=\"fa fa-lg\" ng-class=\"getPropertyFont(\'cardSecurity\')\"></i></span>\n        </div>\n        <p class=\"control-label\" ng-show=\"isPropertyValidationError(\'cardSecurity\')\">\n          Not a valid cvc number!\n        </p>\n\n      </div>\n    </div>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.priceForm.html","<div ng-form name=\"priceForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"priceListName\"\n           ng-model=\"model.selectedItem.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Prices:</label>\n    <div ng-repeat=\"(code, price) in model.selectedItem.prices\">\n      <div class=\"input-group\">\n         <div class=\"input-group-addon market\">{{code}}</div>\n         <input type=\"text\" class=\"form-control\" id=\"exampleInputAmount\" placeholder=\"Amount\" ng-model=\"model.selectedItem.prices[code]\"/>\n         <div class=\"input-group-addon\" ng-click=\"removePriceForMarket(code)\">  <span class=\"glyphicon glyphicon-trash\" aria-hidden=\"true\"></span></div>\n       </div>\n    </div>\n  </div>\n  <div class=\"form-group\">\n    <div class=\"input-group\">\n      <div class=\"input-group-addon market\" style=\"\">\n        <ui-select ng-model=\"local.code\">\n           <ui-select-match>{{$select.selected.code}}</ui-select-match>\n           <ui-select-choices repeat=\"c.code as c in model.markets  | filter: $select.search\">\n             <div ng-bind-html=\"c.code | highlight: $select.search\"></div>\n           </ui-select-choices>\n        </ui-select>\n      </div>\n      <input type=\"text\" class=\"form-control market-pick\" id=\"exampleInputAmount\" placeholder=\"Enter Amount\" ng-model=\"local.price\"/>\n      <div class=\"input-group-addon\" ng-click=\"savePriceForMarket(local.code)\">  <span class=\"glyphicon glyphicon-save\" aria-hidden=\"true\"></span></div>\n     </div>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-success btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"priceForm.$dirty || model.selectedItem._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"model.selectedItem._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
+$templateCache.put("gi.commerce.summary.html","<div class=\"row\">\n  <div class=\"col-xs-5\">\n    <span class=\"fa fa-shopping-cart fa-lg\"></span>\n  </div>\n  <div class=\"col-xs-7\">\n    <span class=\"badge\">{{ giCart.totalItems() }}</span>\n  </div>\n</div>\n");}]);
+angular.module('gi.commerce').directive('giMarketForm', [
+  '$q', 'giCrud', 'giMarket', function($q, Crud, Model) {
+    return Crud.formDirectiveFactory('Market', Model);
+  }
+]);
+
+angular.module('gi.commerce').directive('giOrderSummary', [
+  'giCart', function(Cart) {
+    return {
+      restrict: 'E',
+      templateUrl: 'gi.commerce.orderSummary.html',
       link: function($scope, elem, attrs) {
         return $scope.cart = Cart;
       }
@@ -366,26 +498,14 @@ angular.module('gi.commerce').directive('giCustomerInfo', [
   }
 ]);
 
-angular.module("gi.commerce").run(["$templateCache", function($templateCache) {$templateCache.put("gi.commerce.addressFormFields.html","<legend>{{title}}</legend>\n<div class=\"form-group\">\n  <label>Address Line 1:</label>\n  <input type=\"text\"\n         class=\"form-control\"\n         name=\"{{prefix}}-line1\"\n         ng-model=\"item.line1\"/>\n</div>\n<div class=\"form-group\">\n  <label>Address Line 2:</label>\n  <input type=\"text\"\n         class=\"form-control\"\n         name=\"{{prefix}}-line2\"\n         ng-model=\"item.line2\"/>\n</div>\n<div class=\"form-group\">\n  <label>City:</label>\n  <input type=\"text\"\n         class=\"form-control\"\n         name=\"{{prefix}}-city\"\n         ng-model=\"item.city\"/>\n</div>\n<div class=\"form-group\">\n  <label>State:</label>\n  <input type=\"text\"\n         class=\"form-control\"\n         name=\"{{prefix}}-state\"\n         ng-model=\"item.state\"/>\n</div>\n<div class=\"form-group\">\n  <label class=\"control-label\">Country:</label>\n  <ui-select ng-model=\"item.country\">\n    <ui-select-match>{{$select.selected.name}}</ui-select-match>\n    <ui-select-choices repeat=\"t in model.countries  | filter: $select.search\">\n      <div ng-bind-html=\"t.name | highlight: $select.search\"></div>\n    </ui-select-choices>\n  </ui-select>\n</div>\n");
-$templateCache.put("gi.commerce.addtocart.html","<div ng-hide=\"attrs.id\">\n    <a class=\"btn btn-lg btn-primary\" ng-disabled=\"true\" ng-transclude></a>\n</div>\n<div ng-show=\"attrs.id\">\n    <div ng-hide=\"inCart()\">\n        <a class=\"btn btn-lg btn-primary\"\n           ng-click=\"addItem(item)\"\n           ng-transclude></a>\n    </div>\n    <div class=\"alert alert-info\"  ng-show=\"inCart()\">\n        This item is in your cart\n    </div>\n</div>\n");
-$templateCache.put("gi.commerce.cart.html","\n<div class=\"col-xs-12\" ng-show=\"giCart.totalItems() === 0\">\n    Your cart is empty\n</div>\n\n<div class=\"table-responsive col-xs-12\" ng-show=\"giCart.totalItems() > 0\">\n\n    <table class=\"table table-striped giCart cart\">\n\n        <thead>\n        <tr>\n            <th></th>\n            <th></th>\n            <th>Quantity</th>\n            <th>Amount</th>\n            <th>Total</th>\n        </tr>\n        </thead>\n        <tfoot>\n        <tr ng-show=\"giCart.getTax()\">\n            <th></th>\n            <th></th>\n            <th></th>\n            <th>Tax ({{ giCart.getCart().tax }}%):</th>\n            <th>{{ giCart.getTax() | giCurrency:giCart.getCurrencySymbol }}</th>\n        </tr>\n        <tr ng-show=\"giCart.getShipping()\">\n            <th></th>\n            <th></th>\n            <th></th>\n            <th>Shipping:</th>\n            <th>{{ giCart.getShipping() | giCurrency:giCart.getCurrencySymbol }}</th>\n        </tr>\n        <tr>\n            <th></th>\n            <th></th>\n            <th></th>\n            <th>Total:</th>\n            <th>{{ giCart.totalCost() | giCurrency:giCart.getCurrencySymbol }}</th>\n        </tr>\n        </tfoot>\n        <tbody>\n        <tr ng-repeat=\"item in giCart.getItems() track by $index\">\n            <td><span ng-click=\"giCart.removeItem($index)\" class=\"glyphicon glyphicon-remove\"></span></td>\n            <td>{{ item.getName() }}</td>\n            <td><span class=\"glyphicon glyphicon-minus\" ng-class=\"{\'disabled\':item.getQuantity()==1}\"\n                      ng-click=\"item.setQuantity(-1, true)\"></span>&nbsp;&nbsp;\n                {{ item.getQuantity() | number }}&nbsp;&nbsp;\n                <span class=\"glyphicon glyphicon-plus\" ng-click=\"item.setQuantity(1, true)\"></span></td>\n            <td>{{ item.getPrice(giCart.getTerritoryCode()) | giCurrency:giCart.getCurrencySymbol}}</td>\n            <td>{{ item.getTotal(giCart.getTerritoryCode()) | giCurrency:giCart.getCurrencySymbol}}</td>\n        </tr>\n        </tbody>\n    </table>\n</div>\n<style>\n    .giCart.cart span[ng-click] {\n        cursor: pointer;\n    }\n    .giCart.cart .glyphicon.disabled {\n        color:#aaa;\n    }\n</style>\n");
-$templateCache.put("gi.commerce.cartStage.html","<div class=\"row gi-checkout\" style=\"border-bottom:0;\">\n  <div class=\"col-xs-3 gi-checkout-stage\"\n       ng-class=\"{complete: cart.getStage()>1, active: cart.getStage()==1}\">\n    <div class=\"text-center gi-checkout-stagenum\">Review Cart</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(1)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n    ng-class=\"{complete: cart.getStage()>2, active: cart.getStage()==2, disabled: cart.getStage()<2}\">\n    <div class=\"text-center gi-checkout-stagenum\">Your Details</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(2)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n    ng-class=\"{complete: cart.getStage()>3, active: cart.getStage()==3, disabled: cart.getStage()<3}\">\n    <div class=\"text-center gi-checkout-stagenum\">Payment</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(3)\" class=\"gi-checkout-dot\"></a>\n  </div>\n  <div class=\"col-xs-3 gi-checkout-stage\"\n       ng-class=\"{complete: cart.getStage()>4, active: cart.getStage()==4, disabled: cart.getStage()<4}\">\n    <div class=\"text-center gi-checkout-stagenum\">Complete</div>\n    <div class=\"progress\"><div class=\"progress-bar\"></div></div>\n    <a ng-click=\"cart.setStage(4)\" class=\"gi-checkout-dot\"></a>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.checkout.html","<div class=\"container\">\n  <gi-cart-stage model=\"model\"></gi-cart-stage>\n  <div class=\"row small-gap\">\n    <gi-cart ng-if=\"cart.getStage() == 1\" model=\"model\"></gi-cart>\n    <gi-customer-info ng-if=\"cart.getStage() == 2\" model=\"model\"></gi-customer-info>\n    <gi-payment-info ng-if=\"cart.getStage() == 3\"></gi-payment-info>\n    <pre ng-if=\"cart.getStage() == 4\">Thankyou message to go here</pre>\n  </div>\n  <div class=\"row\">\n    <div class=\"col-md-1\">\n      <div ng-if=\"cart.getStage() > 1\" class=\"btn btn-primary\" ng-click=\"cart.prevStage()\">Prev</div>\n    </div>\n    <div class=\"col-md-1 col-md-offset-10\">\n      <div ng-if=\"cart.getStage() < 3\" class=\"btn btn-primary\" ng-click=\"cart.nextStage()\">Next</div>\n      <div ng-if=\"cart.getStage() == 3\" class=\"btn btn-primary\" ng-click=\"cart.payNow()\">Pay Now</div>\n    </div>\n  </div>\n  <div class=\"row medium-gap\">\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.countryForm.html","<div ng-form name=\"countryForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"countryName\"\n           ng-model=\"model.selectedItem.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"countryCode\"\n           ng-model=\"model.selectedItem.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label class=\"control-label\">Territory:</label>\n    <ui-select ng-model=\"model.selectedItem.territoryId\">\n      <ui-select-match>{{$select.selected.name}}</ui-select-match>\n      <ui-select-choices repeat=\"c._id as c in model.territories  | filter: $select.search\">\n        <div ng-bind-html=\"c.name | highlight: $select.search\"></div>\n      </ui-select-choices>\n    </ui-select>\n  </div>\n  <div class=\"form-group\">\n    <div class=\"checkbox\">\n      <label>\n        <input type=\"checkbox\" ng-model=\"model.selectedItem.default\"> Use as Default Country?\n      </label>\n    </div>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"countryForm.$dirty || model.selectedItem._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"model.selectedItem._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.currencyForm.html","<div ng-form name=\"currencyForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencyName\"\n           ng-model=\"item.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencyCode\"\n           ng-model=\"item.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Symbol:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"currencSymbol\"\n           ng-model=\"item.symbol\"/>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"currencyForm.$dirty || item._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"item._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.customerForm.html","<div ng-form name=\"customerForm\" class=\"well form\">\n  <div class=\"row\">\n    <div class=\"col-md-12\">\n      <div class=\"form-group\" ng-if=\"model.me.loggedIn\">\n        Hi {{model.me.user.firstName}} welcome back. We will e-mail confirmation of your order to your e-mail address:\n        <strong>{{model.me.user.email}}</strong>\n      </div>\n      <div class=\"form-group\" ng-if=\"!model.me.loggedIn\">\n        Already have an account? <a ng-click=\"requestLogin()\">Please Sign In</a>\n      </div>\n      <div class=\"form-group\">\n        <div class=\"checkbox\">\n          <label>\n            <input type=\"checkbox\" ng-model=\"cart.business\"> Buying for a company?\n          </label>\n        </div>\n      </div>\n    </div>\n    <div class=\"col-md-6\" ng-if=\"!model.me.loggedIn\">\n      <div class=\"form-group\">\n        <label>Name:</label>\n        <input type=\"text\"\n               class=\"form-control\"\n               name=\"name\"\n               ng-model=\"model.selectedItem.name\"/>\n      </div>\n      <div class=\"form-group\">\n        <label>Email:</label>\n        <input type=\"text\"\n               class=\"form-control\"\n               name=\"email\"\n               ng-model=\"model.selectedItem.email\"/>\n      </div>\n      <div class=\"form-group\">\n        <label>Password:</label>\n        <input type=\"password\"\n               class=\"form-control\"\n               name=\"password\"\n               ng-model=\"model.selectedItem.password\"/>\n      </div>\n    </div>\n    <div class=\"col-md-6\" ng-if=\"cart.business\">\n      <div class=\"form-group\" >\n        <label>Company Name:</label>\n        <input type=\"text\"\n               class=\"form-control\"\n               name=\"countryName\"\n               ng-model=\"cart.companyName\"/>\n      </div>\n      <div class=\"form-group\">\n        <label>VAT Number (optional):</label>\n        <input type=\"text\"\n               class=\"form-control\"\n               name=\"countryName\"\n               ng-model=\"cart.companyVAT\"/>\n      </div>\n    </div>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.customerInfo.html","<div class=\"row medium-gap\">\n  <div class=\"col-md-12\">\n    <gi-customer-form model=\"model\"><gi-customer-form>\n  </div>\n</div>\n<div class=\"row\">\n  <div class=\"col-md-12\">\n    <div ng-form name=\"addressForm\" class=\"form well\">\n      <div class=\"row\">\n        <div ng-if=\"cart.needsShipping()\" class=\"col-md-12\">\n          <div class=\"form-group\">\n            <div class=\"checkbox\">\n              <label>\n                <input type=\"checkbox\" ng-model=\"cart.differentShipping\"> Ship to different address?\n              </label>\n            </div>\n          </div>\n        </div>\n        <div class=\"col-md-6\">\n          <gi-address-form-fields item=\"cart.billingAddress\"\n                           title=\"Please enter your billing address\"\n                           prefix=\"billing\">\n          </gi-address-form-fields>\n        </div>\n\n        <div class=\"col-md-6\" ng-if=\"cart.differentShipping\">\n          <gi-address-form-fields item=\"cart.shippingAddress\"\n                           title=\"Please enter your shipping address\"\n                           prefix=\"shipping\">\n          </gi-address-form-fields>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.paymentInfo.html","<div ng-form name=\"cardForm\" class=\"well form\">\n  <legend>Please enter your card details</legend>\n  <div class=\"form-group\" ng-class=\"{\'has-error\': isNumberValidationError(), \'has-success\': isNumberValidationSuccess()}\">\n    <label class=\"control-label\">Card Number:</label>\n    <div class=\"input-group\">\n      <input type=\"text\"\n           class=\"form-control\"\n           name=\"cardNumber\"\n           ng-model=\"cart.card.number\"\n           gi-cc-num\n           cc-eager-type />\n      <span class=\"input-group-addon\"><i class=\"fa fa-lg\" ng-class=\"getCreditFont()\"></i></span>\n    </div>\n    <p class=\"control-label\" ng-show=\"isNumberValidationError()\">\n      Not a valid card number!\n    </p>\n  </div>\n  <div class=\"form-group\">\n    <label>Expiry Date:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"cardExpiry\"\n           ng-model=\"cart.card.expiry\"/>\n  </div>\n  <div class=\"form-group\" ng-class=\"{\'has-error\': isSecurityValidationError(), \'has-success\': isSecurityValidationSuccess()}\">\n    <label>CVC:</label>\n    <div class=\"input-group\">\n      <input type=\"text\"\n             class=\"form-control\"\n             name=\"cardSecurity\"\n             ng-model=\"cart.card.security\"\n             gi-cc-cvc\n             gi-cc-type=\"cardForm.cardNumber.$giCcType\"/>\n      <span class=\"input-group-addon\"><i class=\"fa fa-lg\" ng-class=\"getCvcFont()\"></i></span>\n    </div>\n    <p class=\"control-label\" ng-show=\"isSecurityValidationError()\">\n      Not a valid cvc number!\n    </p>\n\n  </div>\n  <pre>{{cardForm.cardNumber.$giCcType | json}}</pre>\n</div>\n<pre>{{cardForm.cardNumber.$giCcType | json}}</pre>\n");
-$templateCache.put("gi.commerce.priceForm.html","<div ng-form name=\"priceForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"priceListName\"\n           ng-model=\"model.selectedItem.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Prices:</label>\n    <div ng-repeat=\"(code, price) in model.selectedItem.prices\">\n      <div class=\"input-group\">\n         <div class=\"input-group-addon territory\">{{code}}</div>\n         <input type=\"text\" class=\"form-control\" id=\"exampleInputAmount\" placeholder=\"Amount\" ng-model=\"model.selectedItem.prices[code]\"/>\n         <div class=\"input-group-addon\" ng-click=\"removePriceForTerritory(code)\">  <span class=\"glyphicon glyphicon-trash\" aria-hidden=\"true\"></span></div>\n       </div>\n    </div>\n  </div>\n  <div class=\"form-group\">\n    <div class=\"input-group\">\n      <div class=\"input-group-addon territory\" style=\"\">\n        <ui-select ng-model=\"local.code\">\n           <ui-select-match>{{$select.selected.code}}</ui-select-match>\n           <ui-select-choices repeat=\"c.code as c in model.territories  | filter: $select.search\">\n             <div ng-bind-html=\"c.code | highlight: $select.search\"></div>\n           </ui-select-choices>\n        </ui-select>\n      </div>\n      <input type=\"text\" class=\"form-control territory-pick\" id=\"exampleInputAmount\" placeholder=\"Enter Amount\" ng-model=\"local.price\"/>\n      <div class=\"input-group-addon\" ng-click=\"savePriceForTerritory(local.code)\">  <span class=\"glyphicon glyphicon-save\" aria-hidden=\"true\"></span></div>\n     </div>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-success btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"priceForm.$dirty || model.selectedItem._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"model.selectedItem._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.summary.html","<div class=\"row\">\n  <div class=\"col-xs-5\">\n    <svg version=\"1.1\"  class=\"icon basket\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"30px\" height=\"30px\" xml:space=\"preserve\">\n      <path d=\"M27.715,10.48l-2.938,6.312c-0.082,0.264-0.477,0.968-1.318,0.968H11.831\n                c-0.89,0-1.479-0.638-1.602-0.904l-2.048-6.524C7.629,8.514,8.715,7.933,9.462,7.933c0.748,0,14.915,0,16.805,0\n                C27.947,7.933,28.17,9.389,27.715,10.48L27.715,10.48z M9.736,9.619c0.01,0.061,0.026,0.137,0.056,0.226l1.742,6.208\n                c0.026,0.017,0.058,0.028,0.089,0.028h11.629l2.92-6.27c0.025-0.073,0.045-0.137,0.053-0.192H9.736L9.736,9.619z M13.544,25.534\n                c-0.819,0-1.482-0.662-1.482-1.482s0.663-1.484,1.482-1.484c0.824,0,1.486,0.664,1.486,1.484S14.369,25.534,13.544,25.534\n                L13.544,25.534z M23.375,25.534c-0.82,0-1.482-0.662-1.482-1.482s0.662-1.484,1.482-1.484c0.822,0,1.486,0.664,1.486,1.484\n                S24.197,25.534,23.375,25.534L23.375,25.534z M24.576,21.575H13.965c-2.274,0-3.179-2.151-3.219-2.244\n                c-0.012-0.024-0.021-0.053-0.028-0.076c0,0-3.56-12.118-3.834-13.05c-0.26-0.881-0.477-1.007-1.146-1.007H2.9\n                c-0.455,0-0.82-0.364-0.82-0.818s0.365-0.82,0.82-0.82h2.841c1.827,0,2.4,1.103,2.715,2.181\n                c0.264,0.898,3.569,12.146,3.821,12.999c0.087,0.188,0.611,1.197,1.688,1.197h10.611c0.451,0,0.818,0.368,0.818,0.818\n                C25.395,21.21,25.027,21.575,24.576,21.575L24.576,21.575z\"/>\n    </svg>\n  </div>\n  <div class=\"col-xs-7\">\n    <span class=\"badge\">{{ giCart.totalItems() }}</span>\n  </div>\n</div>\n");
-$templateCache.put("gi.commerce.territoryForm.html","<div ng-form name=\"territoryForm\" class=\"well form\">\n  <div class=\"form-group\">\n    <label>Name:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"territoryName\"\n           ng-model=\"model.selectedItem.name\"/>\n  </div>\n  <div class=\"form-group\">\n    <label>Code:</label>\n    <input type=\"text\"\n           class=\"form-control\"\n           name=\"territoryCode\"\n           ng-model=\"model.selectedItem.code\"/>\n  </div>\n  <div class=\"form-group\">\n    <label class=\"control-label\">Currency:</label>\n    <ui-select ng-model=\"model.selectedItem.currencyId\">\n      <ui-select-match>{{$select.selected.name}}</ui-select-match>\n      <ui-select-choices repeat=\"c._id as c in model.currencies  | filter: $select.search\">\n        <div ng-bind-html=\"c.name | highlight: $select.search\"></div>\n      </ui-select-choices>\n    </ui-select>\n  </div>\n  <div class=\"form-group\">\n    <div class=\"checkbox\">\n      <label>\n        <input type=\"checkbox\" ng-model=\"model.selectedItem.default\"> Use as Default Territory?\n      </label>\n    </div>\n  </div>\n  <div class=\"form-group\">\n    <button class=\"form-control btn btn-primary btn-save-asset\"\n            ng-click=\"save()\">{{submitText}}</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"countryForm.$dirty || model.selectedItem._id\">\n    <button class=\"form-control btn btn-warning\"\n            ng-click=\"clear()\">Cancel</button>\n  </div>\n  <div class=\"form-group\" ng-show=\"model.selectedItem._id\">\n    <button class=\"form-control btn btn-danger\" ng-click=\"destroy()\">\n      Delete <span ng-if=\"confirm\">- Are you sure? Click again to confirm</span>\n    </button>\n  </div>\n</div>\n");}]);
 angular.module('gi.commerce').directive('giPaymentInfo', [
   'giCart', function(Cart) {
     return {
       restrict: 'E',
       templateUrl: 'gi.commerce.paymentInfo.html',
       scope: {
-        model: '='
+        model: '=',
+        stage: '@'
       },
       link: function($scope, elem, attrs) {
         $scope.cart = Cart;
@@ -399,9 +519,9 @@ angular.module('gi.commerce').directive('giPaymentInfo', [
               return "fa-credit-card";
           }
         };
-        $scope.getCvcFont = function() {
-          if ($scope.cardForm.cardSecurity.$touched) {
-            if ($scope.cardForm.cardSecurity.$invalid) {
+        $scope.getPropertyFont = function(prop) {
+          if ($scope.cardForm[prop].$touched) {
+            if ($scope.cardForm[prop].$invalid) {
               return "fa-exclamation-circle";
             } else {
               return "fa-check-circle";
@@ -410,21 +530,18 @@ angular.module('gi.commerce').directive('giPaymentInfo', [
             return "";
           }
         };
-        $scope.isNumberValidationError = function() {
-          return $scope.cardForm.cardNumber.$invalid && $scope.cardForm.cardNumber.$touched && $scope.cardForm.cardNumber.$dirty;
+        $scope.isPropertyValidationError = function(prop) {
+          return $scope.cardForm[prop].$invalid && $scope.cardForm[prop].$touched && $scope.cardForm[prop].$dirty;
         };
-        $scope.isNumberValidationSuccess = function() {
-          return $scope.cardForm.cardNumber.$valid && $scope.cardForm.cardNumber.$touched && $scope.cardForm.cardNumber.$dirty;
+        $scope.isPropertyValidationSuccess = function(prop) {
+          return $scope.cardForm[prop].$valid && $scope.cardForm[prop].$touched && $scope.cardForm[prop].$dirty;
         };
-        $scope.isSecurityValidationError = function() {
-          return $scope.cardForm.cardSecurity.$invalid && $scope.cardForm.cardSecurity.$touched && $scope.cardForm.cardSecurity.$dirty;
-        };
-        $scope.isSecurityValidationSuccess = function() {
-          return $scope.cardForm.cardSecurity.$valid && $scope.cardForm.cardSecurity.$touched && $scope.cardForm.cardSecurity.$dirty;
-        };
-        return $scope.isPayNowEnabled = function() {
+        $scope.isPayNowEnabled = function() {
           return $scope.cardForm.$valid;
         };
+        return $scope.$watch('cardForm.$valid', function(valid) {
+          return $scope.cart.setStageValidity($scope.stage, valid);
+        });
       }
     };
   }
@@ -442,7 +559,7 @@ angular.module('gi.commerce').directive('giPriceForm', [
       link: {
         pre: function($scope) {
           $scope.local = {};
-          $scope.savePriceForTerritory = function(code) {
+          $scope.savePriceForMarket = function(code) {
             if ($scope.model.selectedItem != null) {
               if ($scope.model.selectedItem.prices == null) {
                 $scope.model.selectedItem.prices = {};
@@ -451,7 +568,7 @@ angular.module('gi.commerce').directive('giPriceForm', [
               return $scope.local = {};
             }
           };
-          $scope.removePriceForTerritory = function(code) {
+          $scope.removePriceForMarket = function(code) {
             var ref;
             if (((ref = $scope.model.selectedItem) != null ? ref.prices : void 0) != null) {
               return delete $scope.model.selectedItem.prices[code];
@@ -513,55 +630,6 @@ angular.module('gi.commerce').directive('giPriceForm', [
           };
         }
       }
-    };
-  }
-]);
-
-angular.module('gi.commerce').directive('giTerritoryForm', [
-  '$q', 'giCrud', 'giTerritory', function($q, Crud, Model) {
-    return Crud.formDirectiveFactory('Territory', Model);
-  }
-]);
-
-angular.module('gi.commerce').filter('giCurrency', [
-  '$filter', function($filter) {
-    return function(amount, currencySymbol, fractionSize) {
-      if (angular.isFunction(currencySymbol)) {
-        currencySymbol = currencySymbol();
-      }
-      return $filter('currency')(amount, currencySymbol, fractionSize);
-    };
-  }
-]);
-
-angular.module('gi.commerce').filter('giCurrencyId', [
-  'giCurrency', function(Currency) {
-    return function(currencyId) {
-      var cur, result;
-      result = "N/A";
-      if (currencyId != null) {
-        cur = Currency.getCached(currencyId);
-        if (cur != null) {
-          result = cur.symbol + ' ' + cur.code;
-        }
-      }
-      return result;
-    };
-  }
-]);
-
-angular.module('gi.commerce').filter('giTerritoryId', [
-  'giTerritory', function(Model) {
-    return function(id) {
-      var cur, result;
-      result = "N/A";
-      if (id != null) {
-        cur = Model.getCached(id);
-        if (cur != null) {
-          result = cur.code;
-        }
-      }
-      return result;
     };
   }
 ]);
@@ -715,9 +783,16 @@ angular.module('gi.commerce').factory('giCardType', [
 ]);
 
 angular.module('gi.commerce').factory('giCart', [
-  '$rootScope', 'giCartItem', 'giLocalStorage', 'giCountry', 'giCurrency', 'giPayment', 'giTerritory', function($rootScope, giCartItem, store, Country, Currency, Payment, Territory) {
-    var cart, getItemById, getSubTotal, init, save;
+  '$rootScope', '$http', 'giCartItem', 'giLocalStorage', 'giCountry', 'giCurrency', 'giPayment', 'giMarket', function($rootScope, $http, giCartItem, store, Country, Currency, Payment, Market) {
+    var c, calculateTaxRate, cart, getItemById, getPricingInfo, getSubTotal, getTaxTotal, init, save;
     cart = {};
+    getPricingInfo = function() {
+      return {
+        marketCode: cart.market.code,
+        taxRate: cart.tax,
+        taxInclusive: cart.taxInclusive
+      };
+    };
     getItemById = function(itemId) {
       var build;
       build = null;
@@ -729,18 +804,29 @@ angular.module('gi.commerce').factory('giCart', [
       return build;
     };
     getSubTotal = function() {
-      var total;
-      total = 0;
+      var priceInfo, subTotal;
+      subTotal = 0;
+      priceInfo = getPricingInfo();
       angular.forEach(cart.items, function(item) {
-        return total += item.getTotal(cart.territory.code);
+        return subTotal += item.getSubTotal(priceInfo);
       });
-      return total;
+      return +subTotal.toFixed(2);
+    };
+    getTaxTotal = function() {
+      var priceInfo, taxTotal;
+      taxTotal = 0;
+      priceInfo = getPricingInfo();
+      angular.forEach(cart.items, function(item) {
+        return taxTotal += item.getTaxTotal(priceInfo);
+      });
+      return +taxTotal.toFixed(2);
     };
     init = function() {
       cart = {
-        tax: 0,
+        tax: null,
         items: [],
         stage: 1,
+        validStages: {},
         country: {
           code: 'GB'
         },
@@ -748,15 +834,35 @@ angular.module('gi.commerce').factory('giCart', [
           code: 'GBP',
           symbol: '£'
         },
-        territory: {
+        market: {
           code: 'UK'
-        }
+        },
+        company: {},
+        taxInclusive: true
       };
     };
     save = function() {
       return store.set('cart', JSON.stringify(cart));
     };
-    return {
+    calculateTaxRate = function() {
+      var countryCode, ref, ref1, uri;
+      countryCode = cart.country.code;
+      uri = '/api/taxRate?countryCode=' + countryCode;
+      if (((ref = c.company) != null ? ref.VAT : void 0) != null) {
+        uri += '&vatNumber=' + c.company.VAT;
+      }
+      if (((ref1 = c.billingAddress) != null ? ref1.code : void 0) != null) {
+        uri += '&postalCode=' + c.billingAddress.code;
+      }
+      return $http.get(uri).success(function(data) {
+        cart.tax = data.rate;
+        return cart.tax;
+      }).error(function(err) {
+        cart.tax = -1;
+        return cart.tax;
+      });
+    };
+    c = {
       init: init,
       addItem: function(id, name, priceList, quantity, data) {
         var inCart, newItem;
@@ -770,19 +876,21 @@ angular.module('gi.commerce').factory('giCart', [
         }
         return $rootScope.$broadcast('giCart:change', {});
       },
-      setTax: function(tax) {
+      setTaxRate: function(tax) {
         return cart.tax = tax;
       },
-      getTax: function() {
-        var sub;
-        if (cart.tax > 0) {
-          sub = getSubTotal();
-          return (getSubTotal() / 100) * cart.tax;
+      getTaxRate: function() {
+        if (cart.tax >= 0) {
+          return cart.tax;
         } else {
-          return 0;
+          return -1;
         }
       },
+      setTaxInclusive: function(isInclusive) {
+        return cart.taxInclusive = isInclusive;
+      },
       getSubTotal: getSubTotal,
+      getTaxTotal: getTaxTotal,
       getItems: function() {
         return cart.items;
       },
@@ -804,6 +912,16 @@ angular.module('gi.commerce').factory('giCart', [
           return cart.stage = stage;
         }
       },
+      setStageValidity: function(stage, valid) {
+        return cart.validStages[stage] = valid;
+      },
+      isStageInvalid: function(stage) {
+        if (cart.validStages[stage] != null) {
+          return !cart.validStages[stage];
+        } else {
+          return true;
+        }
+      },
       getCurrencySymbol: function() {
         return cart.currency.symbol;
       },
@@ -813,22 +931,25 @@ angular.module('gi.commerce').factory('giCart', [
       getCountryCode: function() {
         return cart.country.code;
       },
-      getTerritoryCode: function() {
-        return cart.territory.code;
+      getPricingInfo: getPricingInfo,
+      setCustomer: function(customer) {
+        return this.customer = customer;
       },
       setCountry: function(code) {
         return Currency.all().then(function() {
-          return Territory.all().then(function(territories) {
+          return Market.all().then(function(markets) {
             return Country.getFromCode(code).then(function(country) {
               if (country != null) {
                 cart.country = country;
-                cart.territory = Territory.getCached(cart.country.territoryId);
-                return cart.currency = Currency.getCached(cart.territory.currencyId);
+                cart.market = Market.getCached(cart.country.marketId);
+                cart.currency = Currency.getCached(cart.market.currencyId);
+                return calculateTaxRate();
               }
             });
           });
         });
       },
+      calculateTaxRate: calculateTaxRate,
       needsShipping: function() {
         var result;
         result = false;
@@ -843,12 +964,37 @@ angular.module('gi.commerce').factory('giCart', [
         return cart.items.length;
       },
       totalCost: function() {
-        return getSubTotal();
+        return getSubTotal() + getTaxTotal();
       },
       removeItem: function(index) {
         cart.items.splice(index, 1);
         $rootScope.$broadcast('giCart:itemRemoved', {});
         return $rootScope.$broadcast('giCart:change', {});
+      },
+      payNow: function() {
+        var that;
+        console.log('in pay now cart service');
+        that = this;
+        return Payment.stripe.getToken(that.card).then(function(token) {
+          var chargeRequest;
+          chargeRequest = {
+            token: token.id,
+            total: that.totalCost(),
+            billing: that.billingAddress,
+            shipping: that.shippingAddress,
+            customer: that.customer,
+            currency: that.getCurrencyCode().toLowerCase()
+          };
+          return Payment.stripe.charge(chargeRequest).then(function(result) {
+            return cart.stage = 4;
+          }, function(err) {
+            console.log('charge failed');
+            return console.log(err);
+          });
+        }, function(err) {
+          console.log('failed to get stripe token');
+          return console.log(err);
+        });
       },
       empty: function() {
         cart.items = [];
@@ -864,6 +1010,7 @@ angular.module('gi.commerce').factory('giCart', [
         return save();
       }
     };
+    return c;
   }
 ]);
 
@@ -904,10 +1051,11 @@ angular.module('gi.commerce').factory('giCartItem', [
         return console.error('A Price List must be provided');
       }
     };
-    item.prototype.getPrice = function(territoryCode) {
-      var ref, ref1;
-      if (((ref = this._priceList) != null ? (ref1 = ref.prices) != null ? ref1[territoryCode] : void 0 : void 0) != null) {
-        return this._priceList.prices[territoryCode];
+    item.prototype.getPrice = function(priceInfo) {
+      var marketCode, ref, ref1;
+      marketCode = priceInfo.marketCode;
+      if (((ref = this._priceList) != null ? (ref1 = ref.prices) != null ? ref1[marketCode] : void 0 : void 0) != null) {
+        return this._priceList.prices[marketCode];
       } else {
         return 0;
       }
@@ -944,8 +1092,31 @@ angular.module('gi.commerce').factory('giCartItem', [
         console.info('This item has no data');
       }
     };
-    item.prototype.getTotal = function(territoryCode) {
-      return this.getQuantity() * this.getPrice(territoryCode);
+    item.prototype.getSubTotal = function(priceInfo) {
+      var itemPrice;
+      itemPrice = this.getPrice(priceInfo);
+      if (priceInfo.taxRate > 0 && priceInfo.taxInclusive) {
+        itemPrice = itemPrice / (1 + (priceInfo.taxRate / 100));
+      }
+      return +(this.getQuantity() * itemPrice).toFixed(2);
+    };
+    item.prototype.getTaxTotal = function(priceInfo) {
+      var itemPrice, taxTotal;
+      if (priceInfo.taxRate > 0) {
+        itemPrice = this.getPrice(priceInfo);
+        taxTotal = 0;
+        if (priceInfo.taxInclusive) {
+          taxTotal = itemPrice - (itemPrice / (1 + (priceInfo.taxRate / 100)));
+        } else {
+          taxTotal = itemPrice * (priceInfo.taxRate / 100);
+        }
+        return +(this.getQuantity() * taxTotal).toFixed(2);
+      } else {
+        return 0;
+      }
+    };
+    item.prototype.getTotal = function(priceInfo) {
+      return this.getSubTotal(priceInfo) + this.getTaxTotal(priceInfo);
     };
     item.prototype.needsShipping = function() {
       return this._data.physical;
@@ -994,6 +1165,12 @@ angular.module('gi.commerce').factory('giCountry', [
 angular.module('gi.commerce').factory('giCurrency', [
   '$filter', 'giCrud', 'giCountry', function($filter, Crud, Country) {
     return Crud.factory('currency');
+  }
+]);
+
+angular.module('gi.commerce').factory('giMarket', [
+  'giCrud', function(Crud) {
+    return Crud.factory('market');
   }
 ]);
 
@@ -1111,14 +1288,18 @@ angular.module('gi.commerce').factory('giPayment', [
           return Stripe.setPublishableKey(key);
         },
         getToken: function(card) {
-          var deferred, stripeCard;
+          var deferred, exp, match, stripeCard;
           deferred = $q.defer();
           stripeCard = {
             number: card.number,
-            cvc: card.security,
-            exp_month: card.expiry.split('/')[0],
-            exp_year: card.expiry.split('/')[1]
+            cvc: card.security
           };
+          exp = /^(0[1-9]|1[0-2])\/?(?:20)?([0-9]{2})$/;
+          match = exp.exec(card.expiry);
+          if (match != null) {
+            stripeCard.exp_month = match[1];
+            stripeCard.exp_year = "20" + match[2];
+          }
           Stripe.card.createToken(stripeCard, function(status, response) {
             if (response.error != null) {
               return deferred.reject(response.error.message);
@@ -1245,11 +1426,5 @@ angular.module('gi.commerce').factory('giProduct', [
       destroy: crudService.destroy,
       forCategory: forCategory
     };
-  }
-]);
-
-angular.module('gi.commerce').factory('giTerritory', [
-  'giCrud', function(Crud) {
-    return Crud.factory('territory');
   }
 ]);
