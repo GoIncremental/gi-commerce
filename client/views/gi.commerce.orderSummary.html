@@ -1,0 +1,13 @@
+<div class = "well">
+  <div class="row">
+    <div class="col-md-12">
+      Sub Total:  {{ cart.getSubTotal() | giCurrency:cart.getCurrencySymbol }}
+    </div>
+    <div class="col-md-12">
+      Tax: {{cart.getTaxRate() }}% : {{ cart.getTaxTotal() | giCurrency:cart.getCurrencySymbol }}
+    </div>
+    <div class="col-md-12">
+      Total Cost: {{ cart.totalCost() | giCurrency:cart.getCurrencySymbol }}
+    </div>
+  </div>
+</div>

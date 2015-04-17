@@ -1,8 +1,13 @@
 angular.module('gi.commerce').factory 'giCart'
-, ['$rootScope', 'giCartItem', 'giLocalStorage', 'giCountry'
+, ['$rootScope', '$http', 'giCartItem', 'giLocalStorage', 'giCountry'
 , 'giCurrency', 'giPayment', 'giMarket'
-, ($rootScope, giCartItem, store, Country, Currency, Payment, Market) ->
+, ($rootScope, $http, giCartItem, store, Country, Currency, Payment, Market) ->
   cart = {}
+
+  getPricingInfo = () ->
+    marketCode: cart.market.code
+    taxRate: cart.tax
+    taxInclusive: cart.taxInclusive
 
   getItemById = (itemId) ->
     build = null
@@ -12,14 +17,24 @@ angular.module('gi.commerce').factory 'giCart'
     build
 
   getSubTotal = () ->
-    total = 0
+    subTotal = 0
+    priceInfo = getPricingInfo()
     angular.forEach cart.items, (item) ->
-      total += item.getTotal(cart.market.code)
-    total
+      subTotal += item.getSubTotal(priceInfo)
+
+    +(subTotal).toFixed(2)
+
+  getTaxTotal = () ->
+    taxTotal = 0
+    priceInfo = getPricingInfo()
+    angular.forEach cart.items, (item) ->
+      taxTotal += item.getTaxTotal(priceInfo)
+
+    +(taxTotal).toFixed(2)
 
   init = () ->
     cart =
-      tax : 0
+      tax : null
       items : []
       stage: 1
       validStages: {}
@@ -30,122 +45,172 @@ angular.module('gi.commerce').factory 'giCart'
         symbol: '£'
       market:
         code: 'UK'
+      company: {}
+      taxInclusive: true
+
     return
 
   save = () ->
     store.set 'cart', JSON.stringify(cart)
 
+  calculateTaxRate = () ->
+    countryCode = cart.country.code
+    uri = '/api/taxRate?countryCode=' + countryCode
+    if c.company?.VAT?
+      uri += '&vatNumber=' + c.company.VAT
+    if c.billingAddress?.code?
+      uri += '&postalCode=' + c.billingAddress.code
+
+    $http.get(uri).success (data) ->
+      cart.tax = data.rate
+      cart.tax
+    .error (err) ->
+      cart.tax = -1
+      cart.tax
+
   #Below are the publicly exported functions
-  init: init
+  c =
+    init: init
 
-  addItem: (id, name, priceList, quantity, data) ->
+    addItem: (id, name, priceList, quantity, data) ->
 
-    inCart = getItemById(id)
+      inCart = getItemById(id)
 
-    if angular.isObject(inCart)
-      #Update quantity of an item if it's already in the cart
-      inCart.setQuantity(quantity, false)
-    else
-      newItem = new giCartItem(id, name, priceList, quantity, data)
-      cart.items.push(newItem)
-      $rootScope.$broadcast('giCart:itemAdded', newItem)
+      if angular.isObject(inCart)
+        #Update quantity of an item if it's already in the cart
+        inCart.setQuantity(quantity, false)
+      else
+        newItem = new giCartItem(id, name, priceList, quantity, data)
+        cart.items.push(newItem)
+        $rootScope.$broadcast('giCart:itemAdded', newItem)
 
-    $rootScope.$broadcast('giCart:change', {})
+      $rootScope.$broadcast('giCart:change', {})
 
-  setTax: (tax) ->
-    cart.tax = tax
+    setTaxRate: (tax) ->
+      cart.tax = tax
 
-  getTax: () ->
-    if cart.tax > 0
-      sub = getSubTotal()
-      (getSubTotal()/100) * cart.tax
-    else
-      0
+    getTaxRate: () ->
+      if cart.tax >= 0
+        cart.tax
+      else
+        -1
 
-  getSubTotal: getSubTotal
+    setTaxInclusive: (isInclusive) ->
+      cart.taxInclusive = isInclusive
 
-  getItems: () ->
-    cart.items
+    getSubTotal: getSubTotal
 
-  getStage: () ->
-    cart.stage
+    getTaxTotal: getTaxTotal
 
-  nextStage: () ->
-    if cart.stage < 4
-      cart.stage += 1
+    getItems: () ->
+      cart.items
 
-  prevStage: () ->
-    if cart.stage > 1
-      cart.stage -= 1
+    getStage: () ->
+      cart.stage
 
-  setStage: (stage) ->
-    if stage > 0 and stage < 4
-      cart.stage = stage
+    nextStage: () ->
+      if cart.stage < 4
+        cart.stage += 1
 
-  setStageValidity: (stage, valid) ->
-    cart.validStages[stage] = valid
+    prevStage: () ->
+      if cart.stage > 1
+        cart.stage -= 1
 
-  isStageInvalid: (stage) ->
-    if cart.validStages[stage]?
-      not cart.validStages[stage]
-    else
-      true
+    setStage: (stage) ->
+      if stage > 0 and stage < 4
+        cart.stage = stage
 
-  getCurrencySymbol: () ->
-    cart.currency.symbol
+    setStageValidity: (stage, valid) ->
+      cart.validStages[stage] = valid
 
-  getCurrencyCode: () ->
-    cart.currency.code
+    isStageInvalid: (stage) ->
+      if cart.validStages[stage]?
+        not cart.validStages[stage]
+      else
+        true
 
-  getCountryCode: () ->
-    cart.country.code
+    getCurrencySymbol: () ->
+      cart.currency.symbol
 
-  getMarketCode: () ->
-    cart.market.code
+    getCurrencyCode: () ->
+      cart.currency.code
 
-  setCountry: (code) ->
-    Currency.all().then () ->
-      Market.all()
-      .then (markets) ->
-        Country.getFromCode(code)
-        .then (country) ->
-          if country?
-            cart.country = country
-            cart.market = Market.getCached(cart.country.marketId)
-            cart.currency = Currency.getCached(cart.market.currencyId)
+    getCountryCode: () ->
+      cart.country.code
 
-  needsShipping: () ->
-    result = false
-    angular.forEach cart.items, (item) ->
-      if item.needsShipping()
-        result = true
-    result
+    getPricingInfo: getPricingInfo
 
-  totalItems: () ->
-    cart.items.length
+    setCustomer: (customer) ->
+      @customer = customer
 
-  totalCost:  () ->
-    getSubTotal()
+    setCountry: (code) ->
+      Currency.all().then () ->
+        Market.all()
+        .then (markets) ->
+          Country.getFromCode(code)
+          .then (country) ->
+            if country?
+              cart.country = country
+              cart.market = Market.getCached(cart.country.marketId)
+              cart.currency = Currency.getCached(cart.market.currencyId)
+              calculateTaxRate()
 
-  removeItem: (index) ->
-    cart.items.splice index, 1
-    $rootScope.$broadcast 'giCart:itemRemoved', {}
-    $rootScope.$broadcast 'giCart:change', {}
+    calculateTaxRate: calculateTaxRate
 
-  empty: () ->
-    cart.items = []
-    localStorage.removeItem 'cart'
+    needsShipping: () ->
+      result = false
+      angular.forEach cart.items, (item) ->
+        if item.needsShipping()
+          result = true
+      result
 
-  save: save
+    totalItems: () ->
+      cart.items.length
 
-  restore: (storedCart) ->
-    init()
-    cart.tax = storedCart.tax
+    totalCost:  () ->
+      getSubTotal() + getTaxTotal()
 
-    angular.forEach storedCart.items, (item) ->
-      cart.items.push(new giCartItem(
-        item._id,  item._name, item._priceList, item._quantity, item._data)
-      )
+    removeItem: (index) ->
+      cart.items.splice index, 1
+      $rootScope.$broadcast 'giCart:itemRemoved', {}
+      $rootScope.$broadcast 'giCart:change', {}
 
-    save()
+    payNow: () ->
+      console.log 'in pay now cart service'
+      that = @
+      Payment.stripe.getToken(that.card).then (token) ->
+        chargeRequest =
+          token: token.id
+          total: that.totalCost()
+          billing: that.billingAddress
+          shipping: that.shippingAddress
+          customer: that.customer
+          currency: that.getCurrencyCode().toLowerCase()
+
+        Payment.stripe.charge(chargeRequest).then (result) ->
+          cart.stage = 4
+        , (err) ->
+          console.log 'charge failed'
+          console.log err
+      , (err) ->
+        console.log 'failed to get stripe token'
+        console.log err
+
+    empty: () ->
+      cart.items = []
+      localStorage.removeItem 'cart'
+
+    save: save
+
+    restore: (storedCart) ->
+      init()
+      cart.tax = storedCart.tax
+
+      angular.forEach storedCart.items, (item) ->
+        cart.items.push(new giCartItem(
+          item._id,  item._name, item._priceList, item._quantity, item._data)
+        )
+
+      save()
+  c
 ]

@@ -1,51 +1,55 @@
-<div ng-form name="cardForm" class="well form">
-  <legend>Please enter your card details</legend>
-  <div class="form-group" ng-class="{'has-error': isPropertyValidationError('cardNumber'), 'has-success': isPropertyValidationSuccess('cardNumber')}">
-    <label class="control-label">Card Number:</label>
-    <div class="input-group">
-      <input type="text"
-           class="form-control"
-           name="cardNumber"
-           ng-model="cart.card.number"
-           placeholder="Card Number"
-           gi-cc-num
-           cc-eager-type />
-      <span class="input-group-addon"><i class="fa fa-lg" ng-class="getCreditFont()"></i></span>
-    </div>
-    <p class="control-label" ng-show="isPropertyValidationError('cardNumber')">
-      Not a valid card number!
-    </p>
-  </div>
-  <div class="form-group" ng-class="{'has-error': isPropertyValidationError('cardExpiry'), 'has-success': isPropertyValidationSuccess('cardExpiry')}">
-    <label class="control-label">Expiry Date:</label>
-    <div class="input-group">
-      <input type="text"
-             class="form-control"
-             name="cardExpiry"
-             placeholder="MM/YY"
-             ng-model="cart.card.expiry"
-             gi-cc-exp />
-      <span class="input-group-addon"><i class="fa fa-lg" ng-class="getPropertyFont('cardExpiry')"></i></span>
-    </div>
-    <p class="control-label" ng-show="isPropertyValidationError('cardExpiry')">
-      Not a valid expiry date!
-    </p>
-  </div>
-  <div class="form-group"  ng-class="{'has-error': isPropertyValidationError('cardSecurity'), 'has-success': isPropertyValidationSuccess('cardSecurity')}">
-    <label>CVC:</label>
-    <div class="input-group">
-      <input type="text"
-             class="form-control"
-             name="cardSecurity"
-             ng-model="cart.card.security"
-             placeholder="CVC"
-             gi-cc-cvc
-             gi-cc-type="cardForm.cardNumber.$giCcType"/>
-      <span class="input-group-addon"><i class="fa fa-lg" ng-class="getPropertyFont('cardSecurity')"></i></span>
-    </div>
-    <p class="control-label" ng-show="isPropertyValidationError('cardSecurity')">
-      Not a valid cvc number!
-    </p>
+<div class="row">
+  <div class="col-xs-12">
+    <div ng-form name="cardForm" class="well form">
+      <legend>Please enter your card details</legend>
+      <div class="form-group" ng-class="{'has-error': isPropertyValidationError('cardNumber'), 'has-success': isPropertyValidationSuccess('cardNumber')}">
+        <label class="control-label">Card Number:</label>
+        <div class="input-group">
+          <input type="text"
+               class="form-control"
+               name="cardNumber"
+               ng-model="cart.card.number"
+               placeholder="Card Number"
+               gi-cc-num
+               cc-eager-type />
+          <span class="input-group-addon"><i class="fa fa-lg" ng-class="getCreditFont()"></i></span>
+        </div>
+        <p class="control-label" ng-show="isPropertyValidationError('cardNumber')">
+          Not a valid card number!
+        </p>
+      </div>
+      <div class="form-group" ng-class="{'has-error': isPropertyValidationError('cardExpiry'), 'has-success': isPropertyValidationSuccess('cardExpiry')}">
+        <label class="control-label">Expiry Date:</label>
+        <div class="input-group">
+          <input type="text"
+                 class="form-control"
+                 name="cardExpiry"
+                 placeholder="MM/YY"
+                 ng-model="cart.card.expiry"
+                 gi-cc-exp />
+          <span class="input-group-addon"><i class="fa fa-lg" ng-class="getPropertyFont('cardExpiry')"></i></span>
+        </div>
+        <p class="control-label" ng-show="isPropertyValidationError('cardExpiry')">
+          Not a valid expiry date!
+        </p>
+      </div>
+      <div class="form-group"  ng-class="{'has-error': isPropertyValidationError('cardSecurity'), 'has-success': isPropertyValidationSuccess('cardSecurity')}">
+        <label class="control-label">CVC:</label>
+        <div class="input-group">
+          <input type="text"
+                 class="form-control"
+                 name="cardSecurity"
+                 ng-model="cart.card.security"
+                 placeholder="CVC"
+                 gi-cc-cvc
+                 gi-cc-type="cardForm.cardNumber.$giCcType"/>
+          <span class="input-group-addon"><i class="fa fa-lg" ng-class="getPropertyFont('cardSecurity')"></i></span>
+        </div>
+        <p class="control-label" ng-show="isPropertyValidationError('cardSecurity')">
+          Not a valid cvc number!
+        </p>
 
+      </div>
+    </div>
   </div>
 </div>

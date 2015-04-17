@@ -1,24 +1,30 @@
 <div class="container">
   <gi-cart-stage model="model"></gi-cart-stage>
-  <div class="row small-gap">
+  <div class="small-gap">
     <gi-cart ng-if="cart.getStage() == 1" model="model" stage="1"></gi-cart>
     <gi-customer-info ng-if="cart.getStage() == 2" model="model" stage="2">
     </gi-customer-info>
-    <gi-payment-info ng-if="cart.getStage() == 3" stage="3"></gi-payment-info>
+    <div ng-if="cart.getStage() == 3" >
+      <gi-payment-info stage="3"></gi-payment-info>
+      <gi-order-summary></gi-order-summary>
+
+    </div>
     <pre ng-if="cart.getStage() == 4">Thankyou message to go here</pre>
   </div>
   <div class="row">
-    <div class="col-md-1">
+    <div class="col-xs-6">
       <div ng-if="cart.getStage() > 1" class="btn btn-primary"
            ng-click="cart.prevStage()">Prev</div>
     </div>
-    <div class="col-md-1 col-md-offset-10">
-      <div ng-if="cart.getStage() < 3" class="btn btn-primary"
-           ng-click="cart.nextStage()"
-           ng-disabled="cart.isStageInvalid(cart.getStage())"
-           >Next</div>
-      <div ng-if="cart.getStage() == 3" class="btn btn-primary"
-           ng-click="cart.payNow()"  ng-disabled="cart.isStageInvalid(cart.getStage())">Pay Now</div>
+    <div class="col-xs-6">
+      <div class="pull-right">
+        <div ng-if="cart.getStage() < 3" class="btn btn-primary"
+             ng-click="cart.nextStage()"
+             ng-disabled="cart.isStageInvalid(cart.getStage())"
+             >Next</div>
+        <div ng-if="cart.getStage() == 3" class="btn btn-primary"
+             ng-click="cart.payNow()"  ng-disabled="cart.isStageInvalid(cart.getStage())">Pay Now</div>
+      </div>
     </div>
   </div>
   <div class="row medium-gap">

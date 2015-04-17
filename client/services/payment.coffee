@@ -8,11 +8,17 @@ angular.module('gi.commerce').factory 'giPayment'
 
     getToken: (card) ->
       deferred = $q.defer()
+
       stripeCard =
         number: card.number
         cvc: card.security
-        exp_month: card.expiry.split('/')[0]
-        exp_year: card.expiry.split('/')[1]
+
+      exp = /^(0[1-9]|1[0-2])\/?(?:20)?([0-9]{2})$/
+      match = exp.exec(card.expiry)
+      if match?
+        stripeCard.exp_month = match[1]
+        stripeCard.exp_year = "20" + match[2]
+
       Stripe.card.createToken stripeCard, (status, response) ->
         if response.error?
           deferred.reject response.error.message

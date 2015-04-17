@@ -28,6 +28,13 @@
          ng-model="item.state"/>
 </div>
 <div class="form-group">
+  <label>Post / Zip Code:</label>
+  <input type="text"
+         class="form-control"
+         name="{{prefix}}-code"
+         ng-model="item.code"/>
+</div>
+<div class="form-group">
   <label class="control-label">Country:</label>
   <ui-select ng-model="item.country">
     <ui-select-match>{{$select.selected.name}}</ui-select-match>
