@@ -35,6 +35,7 @@ angular.module('gi.commerce').factory 'giCart'
   init = () ->
     cart =
       tax : null
+      taxName: ""
       items : []
       stage: 1
       validStages: {}
@@ -63,9 +64,11 @@ angular.module('gi.commerce').factory 'giCart'
 
     $http.get(uri).success (data) ->
       cart.tax = data.rate
+      cart.taxName = data.name
       cart.tax
     .error (err) ->
       cart.tax = -1
+      cart.taxName = ""
       cart.tax
 
   #Below are the publicly exported functions
@@ -176,7 +179,6 @@ angular.module('gi.commerce').factory 'giCart'
       $rootScope.$broadcast 'giCart:change', {}
 
     payNow: () ->
-      console.log 'in pay now cart service'
       that = @
       Payment.stripe.getToken(that.card).then (token) ->
         chargeRequest =
@@ -186,6 +188,10 @@ angular.module('gi.commerce').factory 'giCart'
           shipping: that.shippingAddress
           customer: that.customer
           currency: that.getCurrencyCode().toLowerCase()
+          tax:
+            rate: cart.tax
+            name: cart.taxName
+          items: ({name: item._data.name, purchaseType: item._data.purchaseType}) for item in cart.items
 
         Payment.stripe.charge(chargeRequest).then (result) ->
           cart.stage = 4
