@@ -194,6 +194,7 @@ angular.module('gi.commerce').factory 'giCart'
           items: ({name: item._data.name, purchaseType: item._data.purchaseType}) for item in cart.items
 
         Payment.stripe.charge(chargeRequest).then (result) ->
+          $rootScope.$broadcast('giCart:paymentCompleted')
           cart.stage = 4
         , (err) ->
           console.log 'charge failed'

@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.5.4
+- Broadcast event from $rootScope on sucessful purchase completion
+
 v0.5.3
 - Added tax Name to metadata sent to stripe for quaderno invoicing
 v0.5.2
