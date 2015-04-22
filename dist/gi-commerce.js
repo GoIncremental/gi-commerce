@@ -997,6 +997,7 @@ angular.module('gi.commerce').factory('giCart', [
               for (i = 0, len = ref.length; i < len; i++) {
                 item = ref[i];
                 results.push({
+                  id: item._data._id,
                   name: item._data.name,
                   purchaseType: item._data.purchaseType
                 });
@@ -1005,6 +1006,7 @@ angular.module('gi.commerce').factory('giCart', [
             })()
           };
           return Payment.stripe.charge(chargeRequest).then(function(result) {
+            $rootScope.$broadcast('giCart:paymentCompleted');
             return cart.stage = 4;
           }, function(err) {
             console.log('charge failed');
