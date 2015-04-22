@@ -191,7 +191,7 @@ angular.module('gi.commerce').factory 'giCart'
           tax:
             rate: cart.tax
             name: cart.taxName
-          items: ({name: item._data.name, purchaseType: item._data.purchaseType}) for item in cart.items
+          items: ({id: item._data._id, name: item._data.name, purchaseType: item._data.purchaseType}) for item in cart.items
 
         Payment.stripe.charge(chargeRequest).then (result) ->
           $rootScope.$broadcast('giCart:paymentCompleted')
