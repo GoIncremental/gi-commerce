@@ -10,4 +10,7 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
     prefix: '@'
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
+    if not $scope.item?
+      $scope.item = {}
+
 ]
