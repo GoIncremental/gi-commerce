@@ -7,4 +7,4 @@ module.exports = (app) ->
   currency:     conFac app.models.currencies
   country:      conFac app.models.countries
   market:    conFac app.models.markets
-  quaderno: quaderno
+  quaderno: quaderno()

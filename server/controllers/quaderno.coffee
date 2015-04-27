@@ -1,8 +1,10 @@
 request = require 'request'
-quadernoAPI = process.env['QUADERNO_URL']
-quadernoKey = process.env['QUADERNO_KEY']
 
-module.exports =
+
+module.exports = () ->
+  quadernoAPI = process.env['QUADERNO_URL']
+  quadernoKey = process.env['QUADERNO_KEY']
+
   getTaxRate: (req, res) ->
     code = req.query.countryCode or 'GB'
 
@@ -16,5 +18,8 @@ module.exports =
       pass: "x"
 
     request.get url, {auth: auth}, (err, response, body) ->
-      out = JSON.parse(body)
-      res.json 200, out
+      if err?
+        res.json 500, err
+      else
+        out = JSON.parse(body)
+        res.json 200, out
