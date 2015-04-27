@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.5.6
+- Broadcasts giCart:paymentFailed event when payment fails
+
 v0.5.5
 - Fixes country dropdown not populated on address form
 

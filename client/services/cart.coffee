@@ -197,11 +197,9 @@ angular.module('gi.commerce').factory 'giCart'
           $rootScope.$broadcast('giCart:paymentCompleted')
           cart.stage = 4
         , (err) ->
-          console.log 'charge failed'
-          console.log err
+          $rootScope.$broadcast('giCart:paymentFailed', err)
       , (err) ->
-        console.log 'failed to get stripe token'
-        console.log err
+        $rootScope.$broadcast('giCart:paymentFailed', err)
 
     empty: () ->
       cart.items = []
