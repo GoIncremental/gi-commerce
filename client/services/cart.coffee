@@ -1,7 +1,7 @@
 angular.module('gi.commerce').factory 'giCart'
 , ['$rootScope', '$http', 'giCartItem', 'giLocalStorage', 'giCountry'
-, 'giCurrency', 'giPayment', 'giMarket'
-, ($rootScope, $http, giCartItem, store, Country, Currency, Payment, Market) ->
+, 'giCurrency', 'giPayment', 'giMarket', '$window'
+, ($rootScope, $http, giCartItem, store, Country, Currency, Payment, Market, $window) ->
   cart = {}
 
   getPricingInfo = () ->
@@ -177,6 +177,9 @@ angular.module('gi.commerce').factory 'giCart'
       cart.items.splice index, 1
       $rootScope.$broadcast 'giCart:itemRemoved', {}
       $rootScope.$broadcast 'giCart:change', {}
+
+    continueShopping: () ->
+      $window.history.back()
 
     payNow: () ->
       that = @

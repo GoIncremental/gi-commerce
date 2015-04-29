@@ -13,8 +13,10 @@
   </div>
   <div class="row">
     <div class="col-xs-6">
+      <div ng-if="cart.getStage() == 1" class="btn btn-primary"
+           ng-click="cart.continueShopping()">Continue Shopping</div>
       <div ng-if="cart.getStage() > 1" class="btn btn-primary"
-           ng-click="cart.prevStage()">Prev</div>
+           ng-click="cart.prevStage()">Back</div>
     </div>
     <div class="col-xs-6">
       <div class="pull-right">
