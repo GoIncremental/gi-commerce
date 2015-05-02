@@ -1,12 +1,14 @@
 <div class="row medium-gap">
-  <div class="col-md-12">
+  <div class="col-md-4 col-md-push-8">
+    <gi-order-summary></gi-order-summary>
+  </div>
+  <div class="col-md-8 col-md-pull-4">
     <gi-customer-form model="model"><gi-customer-form>
   </div>
 </div>
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-8">
     <div ng-form name="addressForm" class="form well">
-      <div class="row">
         <div ng-if="cart.needsShipping()" class="col-md-12">
           <div class="form-group">
             <div class="checkbox">
@@ -16,15 +18,13 @@
             </div>
           </div>
         </div>
-        <div class="col-md-6">
-          <gi-address-form-fields item="cart.billingAddress"
-                           model="model"
-                           title="Please enter your billing address"
-                           prefix="billing">
-          </gi-address-form-fields>
-        </div>
+        <gi-address-form-fields item="cart.billingAddress"
+                         model="model"
+                         title="Please enter your billing address"
+                         prefix="billing">
+        </gi-address-form-fields>
 
-        <div class="col-md-6" ng-if="cart.differentShipping">
+        <div ng-if="cart.differentShipping">
           <gi-address-form-fields item="cart.shippingAddress"
                            model="model"
                            title="Please enter your shipping address"

@@ -5,9 +5,14 @@
     <gi-customer-info ng-if="cart.getStage() == 2" model="model" stage="2">
     </gi-customer-info>
     <div ng-if="cart.getStage() == 3" >
-      <gi-payment-info stage="3"></gi-payment-info>
-      <gi-order-summary></gi-order-summary>
-
+      <div class="row">
+        <div class="col-md-4 col-md-push-8">
+          <gi-order-summary></gi-order-summary>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+          <gi-payment-info stage="3"></gi-payment-info>
+        </div>
+      </div>
     </div>
     <pre ng-if="cart.getStage() == 4">Thankyou message to go here</pre>
   </div>
@@ -20,11 +25,11 @@
     </div>
     <div class="col-xs-6">
       <div class="pull-right">
-        <div ng-if="cart.getStage() < 3" class="btn btn-primary"
+        <div ng-if="cart.getStage() < 3" class="btn btn-primary btn-cart"
              ng-click="cart.nextStage()"
              ng-disabled="cart.isStageInvalid(cart.getStage())"
              >Next</div>
-        <div ng-if="cart.getStage() == 3" class="btn btn-primary"
+        <div ng-if="cart.getStage() == 3" class="btn btn-primary btn-cart pay-now"
              ng-click="cart.payNow()"  ng-disabled="cart.isStageInvalid(cart.getStage())">Pay Now</div>
       </div>
     </div>
