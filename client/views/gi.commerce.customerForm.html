@@ -39,20 +39,22 @@
                ng-model="model.selectedItem.password"/>
       </div>
     </div>
-    <div class="col-md-12" ng-if="cart.business">
+    <div class="col-md-12">
       <div class="form-group" >
         <label>Company Name:</label>
         <input type="text"
                class="form-control"
                name="countryName"
-               ng-model="cart.company.Name"/>
+               ng-model="cart.company.Name"
+               ng-disabled="!cart.business"/>
       </div>
       <div class="form-group">
         <label>VAT Number (optional):</label>
         <input type="text"
                class="form-control"
                name="countryName"
-               ng-model="cart.company.VAT"/>
+               ng-model="cart.company.VAT"
+               ng-disabled="!cart.business"/>
       </div>
     </div>
   </div>

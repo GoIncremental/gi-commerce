@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.5.11
+- Changed Styling of customer info capture box to disable company name / vat number fields rather than show / hiding them.
+
 v0.5.10
 - Added giEcommerceAnalytics service.  For now only a viewProductList event is supported, more to follow.
 
