@@ -25,18 +25,35 @@
                ng-model="model.selectedItem.name"/>
       </div>
       <div class="form-group">
-        <label>Email:</label>
+        <label class="control-label">Email:</label>
         <input type="text"
                class="form-control"
                name="email"
                ng-model="model.selectedItem.email"/>
       </div>
-      <div class="form-group">
-        <label>Password:</label>
+      <div class="form-group"  ng-class="{'has-error': isPropertyValidationError('password'), 'has-success': isPropertyValidationSuccess('password')}">
+        <label class="control-label">Password:</label>
         <input type="password"
                class="form-control"
                name="password"
-               ng-model="model.selectedItem.password"/>
+               ng-model="model.selectedItem.password"
+               ng-required="!model.me.loggedIn"
+               gi-password />
+         <p class="control-label" ng-show="isPropertyValidationError('password')">
+            Password does not meet minimum requirements (8 characters, at least one number)
+         </p>
+      </div>
+      <div class="form-group" ng-class="{'has-error': isPropertyValidationError('confirm'), 'has-success': isConfirmPasswordSuccess('confirm')}">
+        <label class="control-label">Confirm Password:</label>
+        <input type="password"
+               class="form-control"
+               name="confirm"
+               ng-model="model.selectedItem.confirm"
+               ng-required="!model.me.loggedIn"
+               gi-match="model.selectedItem.password"/>
+        <p class="control-label" ng-show="isPropertyValidationError('confirm')">
+           Passwords do not match
+        </p>
       </div>
     </div>
     <div class="col-md-12">
@@ -44,7 +61,7 @@
         <label>Company Name:</label>
         <input type="text"
                class="form-control"
-               name="countryName"
+               name="companyName"
                ng-model="cart.company.Name"
                ng-disabled="!cart.business"/>
       </div>
@@ -59,3 +76,4 @@
     </div>
   </div>
 </div>
+<pre>{{customerForm | json}}</pre>

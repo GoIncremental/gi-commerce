@@ -9,8 +9,12 @@ angular.module('gi.commerce').directive 'giCustomerInfo'
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
 
-    $scope.$watch 'stage', (newVal) ->
-      if newVal?
-        $scope.cart.setStageValidity(newVal, true)
+    substagesValid = (stage) ->
+      () ->
+        stage1 = (not $scope.cart.isStageInvalid(stage + '-1'))
+        return stage1
+
+    $scope.$watch substagesValid($scope.stage), (newVal) ->
+      $scope.cart.setStageValidity($scope.stage, newVal)
 
 ]

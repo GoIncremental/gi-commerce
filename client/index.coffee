@@ -1,4 +1,4 @@
-angular.module('gi.commerce', ['gi.util'])
+angular.module('gi.commerce', ['gi.util', 'gi.security'])
 .value('version', '0.2.0')
 .run ['$rootScope', 'giCart','giCartItem', 'giLocalStorage'
 , ($rootScope, giCart, giCartItem, store) ->

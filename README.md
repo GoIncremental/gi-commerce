@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.5.12
+- Added validation of passwords and password confirmation
+
 v0.5.11
 - Changed Styling of customer info capture box to disable company name / vat number fields rather than show / hiding them.
 
