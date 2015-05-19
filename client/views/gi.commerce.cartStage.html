@@ -1,13 +1,13 @@
 <div class="row gi-checkout" style="border-bottom:0;">
   <div class="col-xs-3 gi-checkout-stage"
        ng-class="{complete: cart.getStage()>1, active: cart.getStage()==1}">
-    <div class="text-center gi-checkout-stagenum">Review Cart</div>
+    <div class="text-center gi-checkout-stagenum">Review</div>
     <div class="progress"><div class="progress-bar"></div></div>
     <a ng-click="cart.setStage(1)" class="gi-checkout-dot"></a>
   </div>
   <div class="col-xs-3 gi-checkout-stage"
     ng-class="{complete: cart.getStage()>2, active: cart.getStage()==2, disabled: cart.getStage()<2}">
-    <div class="text-center gi-checkout-stagenum">Your Details</div>
+    <div class="text-center gi-checkout-stagenum">Details</div>
     <div class="progress"><div class="progress-bar"></div></div>
     <a ng-click="cart.setStage(2)" class="gi-checkout-dot"></a>
   </div>
