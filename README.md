@@ -9,6 +9,11 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+
+v0.5.16
+- Cart is now mobile responsive on xs screens.
+- Order Summary now displays correctly on xs and sm screens.
+
 v0.5.15
 - triggers 'giCart:accountRequired' event on $rootScope with account info details when new account is required.  Consuming applications should respond to this event by creating an account.
 
