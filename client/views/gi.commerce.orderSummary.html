@@ -1,20 +1,21 @@
-<div class = "form-inline well">
+<div class = "form-inline well hidden-sm hidden-xs">
   <div class="row">
     <div class="col-md-2"></div>
     <div class="col-md-8">
       <legend>Order Summary</legend>
     </div>
   </div>
-  <div class="row">
+
+  <div class="row ">
     <div class="col-md-2">
     </div>
     <div class="col-md-4">
-    <label class="order-summary">Amount:</label>
+      <label class="order-summary">Amount:</label>
     </div>
     <div class="col-md-4">
       <div class="pull-right">
-      <label class="order-summary">{{ cart.getSubTotal() | giCurrency:cart.getCurrencySymbol }}</label>
-    </div>
+        <label class="order-summary">{{ cart.getSubTotal() | giCurrency:cart.getCurrencySymbol }}</label>
+      </div>
     </div>
   </div>
   <div class="row">
@@ -39,6 +40,43 @@
       <div class="pull-right">
         <label>{{ cart.totalCost() | giCurrency:cart.getCurrencySymbol }}</label>
       </div>
+    </div>
+
+  </div>
+</div>
+<div class="visible-sm visible-xs">
+<div class = "form-inline well" style="height: 140px; ">
+  <div class="row">
+    <div class="col-md-2">
+      
+    </div>
+    <div class="col-md-8">
+      <legend>Order Summary</legend>
+    </div>
+  </div>
+
+    <div style="margin-top: -10px;">
+    <div class="col-xs-6" >
+      <label class="pull-right">Amount:   
+      </label>
+    </div>
+    <div class="col-xs-6">
+      <label><span class="">{{ cart.getSubTotal() | giCurrency:cart.getCurrencySymbol }}</span></label>
+    </div>
+    <div class="col-xs-6">
+      <label class="pull-right">Tax:   
+      </label>
+    </div>
+    <div class="col-xs-6">
+      <label><span class="">{{ cart.getTaxTotal() | giCurrency:cart.getCurrencySymbol }}</span></label>
+    </div>
+    <div class="col-xs-6">
+      <label class="pull-right">Total:   
+      </label>
+    </div>
+    <div class="col-xs-6">
+      <label>{{ cart.totalCost() | giCurrency:cart.getCurrencySymbol }}</label>
+    </div>
     </div>
   </div>
 </div>

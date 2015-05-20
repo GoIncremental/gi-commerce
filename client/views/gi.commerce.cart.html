@@ -1,69 +1,137 @@
 <div class="row">
-  <div class="col-xs-12" ng-show="giCart.totalItems() === 0">
-      Your cart is empty
+<div class="col-xs-12" ng-show="giCart.totalItems() === 0" style="text-align: center;">
+    Your cart is empty
+       </br>
+    </br>
+    
   </div>
   <div class="col-xs-12">
-    <div class="table-responsive " ng-show="giCart.totalItems() > 0">
+    <div class="table-responsive hidden-xs" ng-show="giCart.totalItems() > 0">
 
-        <table class="table giCart cart">
-            <thead>
-            <tr>
-                <th></th>
-                <th></th>
-                <th>Quantity</th>
-                <th><div class="pull-right">Amount</div></th>
-                <th><div class="pull-right">Tax</div></th>
-                <th><div class="pull-right">Total</div></th>
+      <table class="table giCart cart">
+        <thead>
+          <tr>
+            <th></th>
+            <th></th>
+            <th>Quantity</th>
+            <th><div class="pull-right">Amount</div></th>
+            <th><div class="pull-right">Tax</div></th>
+            <th><div class="pull-right">Total</div></th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr ng-show="giCart.getShipping()">
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>Shipping:</th>
+            <th><div class="pull-right">{{ giCart.getShipping() | giCurrency:giCart.getCurrencySymbol }}</div></th>
+          </tr>
+          <tr ng-show="giCart.getTaxRate() >= 0">
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th><div class="pull-right">Tax:</div></th>
+            <th><div class="pull-right">{{ giCart.getTaxTotal() | giCurrency:giCart.getCurrencySymbol }}</div></th>
+          </tr>
+          <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th><div class="pull-right">Total:</div></th>
+            <th><div class="pull-right">{{ giCart.totalCost() | giCurrency:giCart.getCurrencySymbol }}</div></th>
+          </tr>
+        </tfoot>
+        <tbody>
+          <tr ng-repeat="item in giCart.getItems() track by $index">
+            <td><span ng-click="giCart.removeItem($index)" class="glyphicon glyphicon-remove"></span></td>
+            <td>{{ item.getName() }}</td>
+            <td><span class="glyphicon glyphicon-minus" ng-class="{'disabled':item.getQuantity()==1}"
+              ng-click="item.setQuantity(-1, true)"></span>&nbsp;&nbsp;
+              {{ item.getQuantity() | number }}&nbsp;&nbsp;
+              <span class="glyphicon glyphicon-plus" ng-click="item.setQuantity(1, true)"></span></td>
+              <td><div class="pull-right">{{ item.getSubTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
+              <td><div class="pull-right">{{ item.getTaxTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
+              <td><div class="pull-right">{{ item.getTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
             </tr>
-            </thead>
-            <tfoot>
-            <tr ng-show="giCart.getShipping()">
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th>Shipping:</th>
-                <th><div class="pull-right">{{ giCart.getShipping() | giCurrency:giCart.getCurrencySymbol }}</div></th>
-            </tr>
-            <tr ng-show="giCart.getTaxRate() >= 0">
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th><div class="pull-right">Tax:</div></th>
-                <th><div class="pull-right">{{ giCart.getTaxTotal() | giCurrency:giCart.getCurrencySymbol }}</div></th>
-            </tr>
-            <tr>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th><div class="pull-right">Total:</div></th>
-                <th><div class="pull-right">{{ giCart.totalCost() | giCurrency:giCart.getCurrencySymbol }}</div></th>
-            </tr>
-            </tfoot>
-            <tbody>
-            <tr ng-repeat="item in giCart.getItems() track by $index">
-                <td><span ng-click="giCart.removeItem($index)" class="glyphicon glyphicon-remove"></span></td>
-                <td>{{ item.getName() }}</td>
-                <td><span class="glyphicon glyphicon-minus" ng-class="{'disabled':item.getQuantity()==1}"
-                          ng-click="item.setQuantity(-1, true)"></span>&nbsp;&nbsp;
-                    {{ item.getQuantity() | number }}&nbsp;&nbsp;
-                    <span class="glyphicon glyphicon-plus" ng-click="item.setQuantity(1, true)"></span></td>
-                <td><div class="pull-right">{{ item.getSubTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
-                <td><div class="pull-right">{{ item.getTaxTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
-                <td><div class="pull-right">{{ item.getTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
-            </tr>
-            </tbody>
+          </tbody>
         </table>
+      </div>
+
+      <div class="visible-xs" ng-show="giCart.totalItems() > 0">
+        <div class="mobile-cart-box" ng-repeat="item in giCart.getItems() track by $index">
+          <h4>{{item.getName() }} </h4>
+          <div class="col-xs-6">
+            <p> Quantity: </p>
+            <span class="glyphicon glyphicon-minus" ng-class="{'disabled':item.getQuantity()==1}"
+            ng-click="item.setQuantity(-1, true)"></span>&nbsp;&nbsp;
+            {{ item.getQuantity() | number }}&nbsp;&nbsp;
+            <span class="glyphicon glyphicon-plus" ng-click="item.setQuantity(1, true)"></span>
+          </div>
+          <div class="col-xs-6">
+            <p> Price: <span class="pull-right"> Tax:</span></p>
+
+            <div class="pull-left">{{ item.getSubTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}
+            </div>
+
+            <div class="pull-right">{{ item.getTaxTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}
+            </div>
+
+          </div>
+        </br>
+      </br>
+    </br>
+  </br>
+  <a ng-click="giCart.removeItem($index)" class="pull-right"> Remove </a>
+</br>
+</br>
+
+</div>
+
+<div class="col-xs-12">
+  <div class="col-xs-6">
+    <p class="pull-left"> Total: </p>
+  </div>
+  <div class="col-xs-6">
+    <div class="pull-right">{{ giCart.totalCost() | giCurrency:giCart.getCurrencySymbol }}</div>
+  </div>
+</div>
+<div class="col-xs-12" ng-show="giCart.getTaxRate() >= 0" >
+  <div class="col-xs-6">
+    <p class="pull-left"> Total Tax: </p>
+  </div>
+  <div class="col-xs-6">
+    <div class="pull-right">{{ giCart.getTaxTotal() | giCurrency:giCart.getCurrencySymbol }}
     </div>
   </div>
 </div>
+<div class="col-xs-12">
+  <div class="col-xs-6">
+    <p class="pull-left"> Order Total: </p>
+  </div>
+  <div class="col-xs-6">
+    <div class="pull-right">{{ giCart.totalCost() | giCurrency:giCart.getCurrencySymbol }}</div>
+  </div>
+</div>
+<div class="col-xs-12" ng-show="giCart.getShipping()">
+  <div class="col-xs-6">
+    <p> Shipping </p>
+  </div>
+  <div class="col-xs-6">
+    <div class="pull-right">{{ giCart.getShipping() | giCurrency:giCart.getCurrencySymbol }}</div>
+  </div>
+</div>
+</div> 
+</div>
+</div>
 <style>
-    .giCart.cart span[ng-click] {
-        cursor: pointer;
-    }
-    .giCart.cart .glyphicon.disabled {
-        color:#aaa;
-    }
+  .giCart.cart span[ng-click] {
+    cursor: pointer;
+  }
+  .giCart.cart .glyphicon.disabled {
+    color:#aaa;
+  }
 </style>
