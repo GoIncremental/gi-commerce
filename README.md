@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.5.14
+- added validation for account username as part of checkout processing
+
 v0.5.13
 - remove <pre> formatting in customer form
 
