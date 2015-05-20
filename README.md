@@ -10,6 +10,7 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 
 ##Release Notes
 v0.5.17
+- Clear cart after sucessful purchase
 - Moved login watcher to checkout so it always fires regardless of where you are in the checkout process.
 
 v0.5.16

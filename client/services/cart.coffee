@@ -203,6 +203,7 @@ angular.module('gi.commerce').factory 'giCart'
 
         Payment.stripe.charge(chargeRequest).then (result) ->
           $rootScope.$broadcast('giCart:paymentCompleted')
+          that.empty()
           cart.stage = 4
         , (err) ->
           $rootScope.$broadcast('giCart:paymentFailed', err)
@@ -210,6 +211,11 @@ angular.module('gi.commerce').factory 'giCart'
         $rootScope.$broadcast('giCart:paymentFailed', err)
 
     empty: () ->
+      @billingAddress = {}
+      @shippingAddress = {}
+      @customerInfo = {}
+      @card = {}
+      @company = {}
       cart.items = []
       localStorage.removeItem 'cart'
 
