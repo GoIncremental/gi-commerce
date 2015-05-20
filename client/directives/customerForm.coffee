@@ -17,19 +17,30 @@ angular.module('gi.commerce').directive 'giCustomerForm'
       if me?.user?
         Cart.setCustomer(me.user)
 
+    fieldUsed = (prop) ->
+      $scope.customerForm[prop].$dirty and
+      $scope.customerForm[prop].$touched
+
     $scope.isPropertyValidationError = (prop) ->
-      $scope.customerForm[prop].$invalid and
-      $scope.customerForm[prop].$touched and
-      $scope.customerForm[prop].$dirty
+      fieldUsed(prop) and
+      $scope.customerForm[prop].$invalid
 
     $scope.isPropertyValidationSuccess = (prop) ->
-      $scope.customerForm[prop].$valid and
-      $scope.customerForm[prop].$touched and
-      $scope.customerForm[prop].$dirty
+      fieldUsed(prop) and
+      $scope.customerForm[prop].$valid
 
     $scope.isConfirmPasswordSuccess = (prop) ->
       $scope.isPropertyValidationSuccess(prop) and
       $scope.isPropertyValidationSuccess('password')
+
+    $scope.isUsernameTaken = () ->
+      fieldUsed('email') and
+      (not $scope.customerForm.email.$error.email) and
+      $scope.customerForm.email.$error.giUsername
+
+    $scope.isEmailInvalid = () ->
+      fieldUsed('email') and
+      $scope.customerForm.email.$error.email
 
     $scope.$watch 'customerForm.$valid', (valid) ->
       $scope.cart.setStageValidity($scope.stage, valid)

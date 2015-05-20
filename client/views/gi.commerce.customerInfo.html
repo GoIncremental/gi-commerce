@@ -11,10 +11,9 @@
     <div ng-form name="addressForm" class="form well">
         <div ng-if="cart.needsShipping()" class="col-md-12">
           <div class="form-group">
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" ng-model="cart.differentShipping"> Ship to different address?
-              </label>
+            <div class="checkbox checkbox-success checkbox-circle">
+              <input type="checkbox" ng-model="cart.differentShipping">
+              <label>Ship to different address?  </label>
             </div>
           </div>
         </div>

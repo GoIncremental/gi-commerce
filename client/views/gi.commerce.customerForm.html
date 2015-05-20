@@ -9,27 +9,49 @@
         Already have an account? <a ng-click="requestLogin()">Please Sign In</a>
       </div>
       <div class="form-group">
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" ng-model="cart.business"> Buying for a company?
-          </label>
+        <div class="checkbox checkbox-success checkbox-circle">
+          <input type="checkbox" ng-model="cart.business">
+          <label>Buying for a company?  </label>
         </div>
       </div>
     </div>
-    <div class="col-md-12" ng-if="!model.me.loggedIn">
-      <div class="form-group">
-        <label>Name:</label>
+    <div class="col-md-12" ng-if="!model.me.loggedIn"  >
+      <div class="form-group" ng-class="{'has-error': isPropertyValidationError('firstName'), 'has-success': isPropertyValidationSuccess('firstName')}">
+        <label class="control-label">First Name:</label>
         <input type="text"
                class="form-control"
-               name="name"
-               ng-model="model.selectedItem.name"/>
+               name="firstName"
+               ng-model="model.selectedItem.firstName"
+               required/>
+         <p class="control-label" ng-show="isPropertyValidationError('firstName')">
+            Please enter your first name.
+         </p>
       </div>
-      <div class="form-group">
-        <label class="control-label">Email:</label>
+      <div class="form-group" ng-class="{'has-error': isPropertyValidationError('lastName'), 'has-success': isPropertyValidationSuccess('lastName')}">
+        <label class="control-label">Last Name:</label>
         <input type="text"
+               class="form-control"
+               name="lastName"
+               ng-model="model.selectedItem.lastName"
+               required/>
+         <p class="control-label" ng-show="isPropertyValidationError('lastName')">
+            Please enter your last name.
+         </p>
+      </div>
+      <div class="form-group" ng-class="{'has-error': isPropertyValidationError('email'), 'has-success': isPropertyValidationSuccess('email')}">
+        <label class="control-label">Email:</label>
+        <input type="email"
                class="form-control"
                name="email"
-               ng-model="model.selectedItem.email"/>
+               ng-model="model.selectedItem.email"
+               required
+               gi-username />
+         <p class="control-label" ng-show="isEmailInvalid()">
+            Please enter a valid e-mail.
+         </p>
+         <p class="control-label" ng-show="isUsernameTaken()">
+            Username already taken.
+         </p>
       </div>
       <div class="form-group"  ng-class="{'has-error': isPropertyValidationError('password'), 'has-success': isPropertyValidationSuccess('password')}">
         <label class="control-label">Password:</label>
