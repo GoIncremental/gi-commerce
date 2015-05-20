@@ -21,7 +21,7 @@
         <input type="text"
                class="form-control"
                name="firstName"
-               ng-model="model.selectedItem.firstName"
+               ng-model="item.firstName"
                required/>
          <p class="control-label" ng-show="isPropertyValidationError('firstName')">
             Please enter your first name.
@@ -32,7 +32,7 @@
         <input type="text"
                class="form-control"
                name="lastName"
-               ng-model="model.selectedItem.lastName"
+               ng-model="item.lastName"
                required/>
          <p class="control-label" ng-show="isPropertyValidationError('lastName')">
             Please enter your last name.
@@ -43,7 +43,7 @@
         <input type="email"
                class="form-control"
                name="email"
-               ng-model="model.selectedItem.email"
+               ng-model="item.email"
                required
                gi-username />
          <p class="control-label" ng-show="isEmailInvalid()">
@@ -58,7 +58,7 @@
         <input type="password"
                class="form-control"
                name="password"
-               ng-model="model.selectedItem.password"
+               ng-model="item.password"
                ng-required="!model.me.loggedIn"
                gi-password />
          <p class="control-label" ng-show="isPropertyValidationError('password')">
@@ -70,9 +70,9 @@
         <input type="password"
                class="form-control"
                name="confirm"
-               ng-model="model.selectedItem.confirm"
+               ng-model="item.confirm"
                ng-required="!model.me.loggedIn"
-               gi-match="model.selectedItem.password"/>
+               gi-match="item.password"/>
         <p class="control-label" ng-show="isPropertyValidationError('confirm')">
            Passwords do not match
         </p>

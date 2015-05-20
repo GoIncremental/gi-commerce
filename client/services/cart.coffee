@@ -181,6 +181,11 @@ angular.module('gi.commerce').factory 'giCart'
     continueShopping: () ->
       $window.history.back()
 
+    checkAccount: () ->
+      if not @customer
+        $rootScope.$broadcast('giCart:accountRequired', @customerInfo)
+      cart.stage += 1
+
     payNow: () ->
       that = @
       Payment.stripe.getToken(that.card).then (token) ->

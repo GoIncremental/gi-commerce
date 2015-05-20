@@ -10,6 +10,8 @@ angular.module('gi.commerce').directive 'giCustomerForm'
   templateUrl: 'gi.commerce.customerForm.html'
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
+    if not $scope.item?
+      $scope.item = {}
     $scope.requestLogin = () ->
       $scope.$emit 'event:show-login'
 

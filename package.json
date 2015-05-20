@@ -1,7 +1,7 @@
 {
   "author": "Go Incremental Limited",
   "name": "gi-commerce",
-  "version": "0.5.14",
+  "version": "0.5.15-dev",
   "main": "./server/index.coffee",
   "scripts": {},
   "repository": {

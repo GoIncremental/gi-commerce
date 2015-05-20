@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.5.15
+- triggers 'giCart:accountRequired' event on $rootScope with account info details when new account is required.  Consuming applications should respond to this event by creating an account.
+
 v0.5.14
 - added validation for account username as part of checkout processing
 

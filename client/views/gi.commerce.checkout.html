@@ -26,7 +26,7 @@
     <div class="col-xs-6">
       <div class="pull-right">
         <div ng-if="cart.getStage() < 3" class="btn btn-primary btn-cart"
-             ng-click="cart.nextStage()"
+             ng-click="cart.checkAccount()"
              ng-disabled="cart.isStageInvalid(cart.getStage())"
              >Next</div>
         <div ng-if="cart.getStage() == 3" class="btn btn-primary btn-cart pay-now"
