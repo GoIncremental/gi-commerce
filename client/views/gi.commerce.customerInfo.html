@@ -20,14 +20,16 @@
         <gi-address-form-fields item="cart.billingAddress"
                          model="model"
                          title="Please enter your billing address"
-                         prefix="billing">
+                         prefix="billing"
+                         form="addressForm">
         </gi-address-form-fields>
 
         <div ng-if="cart.differentShipping">
           <gi-address-form-fields item="cart.shippingAddress"
                            model="model"
                            title="Please enter your shipping address"
-                           prefix="shipping">
+                           prefix="shipping"
+                           form="addressForm">
           </gi-address-form-fields>
         </div>
       </div>

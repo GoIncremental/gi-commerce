@@ -1,38 +1,66 @@
 <legend>{{title}}</legend>
-<div class="form-group">
-  <label>Address Line 1:</label>
+<div class="form-group"
+     ng-class="{
+       'has-error': isPropertyValidationError('{{prefix}}-line1'),
+       'has-success': isPropertyValidationSuccess('{{prefix}}-line1')}">
+  <label class="control-label">Address Line 1:</label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-line1"
-         ng-model="item.line1"/>
+         ng-model="item.line1"
+         required/>
+   <p class="control-label" ng-show="isPropertyValidationError('{{prefix}}-line1')">
+     Required
+   </p>
 </div>
-<div class="form-group">
-  <label>Address Line 2:</label>
+<div class="form-group" >
+  <label class="control-label">Address Line 2:</label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-line2"
          ng-model="item.line2"/>
 </div>
-<div class="form-group">
-  <label>City:</label>
+<div class="form-group"
+     ng-class="{
+       'has-error': isPropertyValidationError('{{prefix}}-city'),
+       'has-success': isPropertyValidationSuccess('{{prefix}}-city')}">
+  <label class="control-label">City:</label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-city"
-         ng-model="item.city"/>
+         ng-model="item.city"
+         required/>
+   <p class="control-label" ng-show="isPropertyValidationError('{{prefix}}-city')">
+     Required
+   </p>
 </div>
-<div class="form-group">
-  <label>State:</label>
+<div class="form-group"
+     ng-class="{
+       'has-error': isPropertyValidationError('{{prefix}}-state'),
+       'has-success': isPropertyValidationSuccess('{{prefix}}-state')}">
+  <label class="control-label">State:</label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-state"
-         ng-model="item.state"/>
+         ng-model="item.state"
+         required/>
+   <p class="control-label" ng-show="isPropertyValidationError('{{prefix}}-state')">
+      Required
+   </p>
 </div>
-<div class="form-group">
-  <label>Post / Zip Code:</label>
+<div class="form-group"
+     ng-class="{
+       'has-error': isPropertyValidationError('{{prefix}}-code'),
+       'has-success': isPropertyValidationSuccess('{{prefix}}-code')}">
+  <label class="control-label">Post / Zip Code:</label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-code"
-         ng-model="item.code"/>
+         ng-model="item.code"
+         required/>
+   <p class="control-label" ng-show="isPropertyValidationError('{{prefix}}-code')">
+      Required
+   </p>
 </div>
 <div class="form-group">
   <label class="control-label">Country:</label>

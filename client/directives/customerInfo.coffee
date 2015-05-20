@@ -12,7 +12,11 @@ angular.module('gi.commerce').directive 'giCustomerInfo'
     substagesValid = (stage) ->
       () ->
         stage1 = (not $scope.cart.isStageInvalid(stage + '-1'))
-        return stage1
+        stage2 = (not $scope.cart.isStageInvalid(stage + '-2'))
+        return stage1 and stage2
+
+    $scope.$watch 'addressForm.$valid', (valid) ->
+      $scope.cart.setStageValidity($scope.stage + '-2', valid)
 
     $scope.$watch substagesValid($scope.stage), (newVal) ->
       $scope.cart.setStageValidity($scope.stage, newVal)
