@@ -15,10 +15,6 @@ angular.module('gi.commerce').directive 'giCustomerForm'
     $scope.requestLogin = () ->
       $scope.$emit 'event:show-login'
 
-    $scope.$watch 'model.me', (me) ->
-      if me?.user?
-        Cart.setCustomer(me.user)
-
     fieldUsed = (prop) ->
       $scope.customerForm[prop].$dirty and
       $scope.customerForm[prop].$touched
