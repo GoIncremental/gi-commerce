@@ -1,13 +1,9 @@
 <div class="row">
-<div class="col-xs-12" ng-show="giCart.totalItems() === 0" style="text-align: center;">
-    Your cart is empty
-       </br>
-    </br>
-    
+  <div class="col-xs-12 col-sm-6 col-sm-offset-3 well" ng-show="giCart.totalItems() === 0">
+    <p>Your cart is empty</p>
   </div>
   <div class="col-xs-12">
     <div class="table-responsive hidden-xs" ng-show="giCart.totalItems() > 0">
-
       <table class="table giCart cart">
         <thead>
           <tr>
@@ -124,7 +120,7 @@
     <div class="pull-right">{{ giCart.getShipping() | giCurrency:giCart.getCurrencySymbol }}</div>
   </div>
 </div>
-</div> 
+</div>
 </div>
 </div>
 <style>

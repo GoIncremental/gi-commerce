@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container gi-cart">
   <gi-cart-stage model="model"></gi-cart-stage>
   <div class="small-gap">
     <gi-cart ng-if="cart.getStage() == 1" model="model" stage="1"></gi-cart>
@@ -14,7 +14,9 @@
         </div>
       </div>
     </div>
-    <pre ng-if="cart.getStage() == 4">Thankyou message to go here</pre>
+    <div ng-if="cart.getStage() == 4">
+      <gi-payment-thanks></gi-payment-thanks>
+    </div>
   </div>
   <div class="row">
     <div class="col-xs-6">
