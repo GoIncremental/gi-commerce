@@ -180,6 +180,13 @@ angular.module('gi.commerce').provider 'giCart', () ->
       totalItems: () ->
         cart.items.length
 
+      totalQuantity: () ->
+        result = 0
+        angular.forEach cart.items, (item) ->
+          result += item._quantity
+
+        result
+
       totalCost:  () ->
         getSubTotal() + getTaxTotal()
 
@@ -192,7 +199,7 @@ angular.module('gi.commerce').provider 'giCart', () ->
         $window.history.back()
 
       checkAccount: () ->
-        if not @customer
+        if @customerInfo and (not @customer)
           $rootScope.$broadcast('giCart:accountRequired', @customerInfo)
         cart.stage += 1
 

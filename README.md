@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.6.1
+- Summary directive now displays total quantity of items, not just number of distinct items
+
 v0.6.0
 - added giPaymentThanks directive allowing the application to inject their own thankyou directive.
 - To achieve this giCart has become a provider, exposing a setThankyouDirective function which accepts a string which will be used to create an element (so typically you'll use the name of your custom directive that you want injecting on the thankyou page)
