@@ -11,6 +11,7 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 ##Release Notes
 v0.6.1
 - Summary directive now displays total quantity of items, not just number of distinct items
+- Fixes issue where register user was called too frequently in the checkout process
 
 v0.6.0
 - added giPaymentThanks directive allowing the application to inject their own thankyou directive.
