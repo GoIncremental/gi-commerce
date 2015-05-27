@@ -57,7 +57,7 @@ angular.module('gi.commerce').provider 'giCart', () ->
       return
 
     save = () ->
-      store.set 'cart', JSON.stringify(cart)
+      store.set 'cart', cart
 
     calculateTaxRate = () ->
       countryCode = cart.country.code
