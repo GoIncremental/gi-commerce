@@ -1,6 +1,6 @@
 angular.module('gi.commerce').directive 'giCustomerForm'
-, ['$q', 'giCurrency', 'giCart'
-, ($q, Currency, Cart) ->
+, ['$q', 'giCurrency', 'giCart', 'giUtil'
+, ($q, Currency, Cart, Util) ->
   restrict: 'E'
   scope:
     model: '='
@@ -9,6 +9,7 @@ angular.module('gi.commerce').directive 'giCustomerForm'
     stage: '@'
   templateUrl: 'gi.commerce.customerForm.html'
   link: ($scope, elem, attrs) ->
+    $scope.emailRegex = Util.emailRegex
     $scope.cart = Cart
     if not $scope.item?
       $scope.item = {}
@@ -34,11 +35,13 @@ angular.module('gi.commerce').directive 'giCustomerForm'
     $scope.isUsernameTaken = () ->
       fieldUsed('email') and
       (not $scope.customerForm.email.$error.email) and
+      (not $scope.customerForm.email.$error.pattern) and
       $scope.customerForm.email.$error.giUsername
 
     $scope.isEmailInvalid = () ->
       fieldUsed('email') and
-      $scope.customerForm.email.$error.email
+      ( $scope.customerForm.email.$error.email or
+      $scope.customerForm.email.$error.pattern)
 
     $scope.$watch 'customerForm.$valid', (valid) ->
       $scope.cart.setStageValidity($scope.stage, valid)

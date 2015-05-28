@@ -45,7 +45,8 @@
                name="email"
                ng-model="item.email"
                required
-               gi-username />
+               gi-username
+               ng-pattern="emailRegex" />
          <p class="control-label" ng-show="isEmailInvalid()">
             Please enter a valid e-mail.
          </p>
