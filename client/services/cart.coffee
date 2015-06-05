@@ -218,6 +218,9 @@ angular.module('gi.commerce').provider 'giCart', () ->
               name: cart.taxName
             items: ({id: item._data._id, name: item._data.name, purchaseType: item._data.purchaseType}) for item in cart.items
 
+          if that.company?
+            chargeRequest.company = that.company
+
           Payment.stripe.charge(chargeRequest).then (result) ->
             $rootScope.$broadcast('giCart:paymentCompleted')
             that.empty()

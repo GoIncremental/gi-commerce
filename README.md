@@ -10,6 +10,8 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 
 ##Release Notes
 v0.6.2
+- Pass company info along with charge request to /api/checkout
+v0.6.2
 - Use giUtil regex for email validation during checkout
 
 v0.6.1
