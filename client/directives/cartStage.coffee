@@ -7,9 +7,4 @@ angular.module('gi.commerce').directive 'giCartStage'
     model: '='
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
-    
-    $scope.$watch 'model.userCountry', (newVal) ->
-      if newVal?
-        Cart.setCountry(newVal.code)
-
 ]

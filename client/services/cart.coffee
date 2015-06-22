@@ -4,9 +4,10 @@ angular.module('gi.commerce').provider 'giCart', () ->
   @setThankyouDirective = (d) ->
     thankyouDirective = d
 
-  @$get = ['$rootScope', '$http', 'giCartItem', 'giLocalStorage', 'giCountry'
-  , 'giCurrency', 'giPayment', 'giMarket', '$window'
-  , ($rootScope, $http, giCartItem, store, Country, Currency, Payment, Market, $window) ->
+  @$get = ['$q', '$rootScope', '$http', 'giCartItem', 'giLocalStorage'
+  , 'giCountry', 'giCurrency', 'giPayment', 'giMarket', '$window'
+  , ($q, $rootScope, $http, giCartItem, store, Country, Currency, Payment
+  , Market, $window) ->
     cart = {}
 
     getPricingInfo = () ->
@@ -44,6 +45,7 @@ angular.module('gi.commerce').provider 'giCart', () ->
         items : []
         stage: 1
         validStages: {}
+        isValid: true
         country:
           code: 'GB'
         currency:
@@ -60,6 +62,7 @@ angular.module('gi.commerce').provider 'giCart', () ->
       store.set 'cart', cart
 
     calculateTaxRate = () ->
+      deferred = $q.defer()
       countryCode = cart.country.code
       uri = '/api/taxRate?countryCode=' + countryCode
       if c.company?.VAT?
@@ -70,11 +73,13 @@ angular.module('gi.commerce').provider 'giCart', () ->
       $http.get(uri).success (data) ->
         cart.tax = data.rate
         cart.taxName = data.name
-        cart.tax
+        deferred.resolve cart.tax
       .error (err) ->
         cart.tax = -1
         cart.taxName = ""
-        cart.tax
+        deferred.reject error
+
+      deferred.promise
 
     #Below are the publicly exported functions
     c =
@@ -131,11 +136,14 @@ angular.module('gi.commerce').provider 'giCart', () ->
       setStageValidity: (stage, valid) ->
         cart.validStages[stage] = valid
 
+      setValidity: (valid) ->
+        cart.isValid = valid
+
       isStageInvalid: (stage) ->
         if cart.validStages[stage]?
-          not cart.validStages[stage]
+          not (cart.isValid and cart.validStages[stage])
         else
-          true
+          not cart.isValid
 
       getCurrencySymbol: () ->
         cart.currency.symbol

@@ -9,7 +9,10 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
-v0.6.2
+v0.6.4
+- added spinner when tax is being calculated
+
+v0.6.3
 - Pass company info along with charge request to /api/checkout
 v0.6.2
 - Use giUtil regex for email validation during checkout
