@@ -16,6 +16,7 @@ v0.6.4
 
 v0.6.3
 - Pass company info along with charge request to /api/checkout
+
 v0.6.2
 - Use giUtil regex for email validation during checkout
 
