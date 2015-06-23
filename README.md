@@ -11,6 +11,7 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 ##Release Notes
 v0.6.4
 - added spinner when tax is being calculated
+- recalculate tax after vat number entered.
 
 v0.6.3
 - Pass company info along with charge request to /api/checkout

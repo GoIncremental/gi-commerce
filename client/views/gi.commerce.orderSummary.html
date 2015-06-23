@@ -21,10 +21,10 @@
   <div class="row">
     <div class="col-md-2">
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4" ng-if="cart.isTaxApplicable()">
       <label class="order-summary">Tax:</label>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4" ng-if="cart.isTaxApplicable()">
       <div class="pull-right">
         <label class="order-summary">{{ cart.getTaxTotal() | giCurrency:cart.getCurrencySymbol }}</label>
       </div>
@@ -48,7 +48,7 @@
 <div class = "form-inline well" style="height: 140px; ">
   <div class="row">
     <div class="col-md-2">
-      
+
     </div>
     <div class="col-md-8">
       <legend>Order Summary</legend>
@@ -57,21 +57,21 @@
 
     <div style="margin-top: -10px;">
     <div class="col-xs-6" >
-      <label class="pull-right">Amount:   
+      <label class="pull-right">Amount:
       </label>
     </div>
     <div class="col-xs-6">
       <label><span class="">{{ cart.getSubTotal() | giCurrency:cart.getCurrencySymbol }}</span></label>
     </div>
-    <div class="col-xs-6">
-      <label class="pull-right">Tax:   
+    <div class="col-xs-6" ng-if="cart.isTaxApplicable()">
+      <label class="pull-right">Tax:
       </label>
     </div>
-    <div class="col-xs-6">
+    <div class="col-xs-6" ng-if="cart.isTaxApplicable()">
       <label><span class="">{{ cart.getTaxTotal() | giCurrency:cart.getCurrencySymbol }}</span></label>
     </div>
     <div class="col-xs-6">
-      <label class="pull-right">Total:   
+      <label class="pull-right">Total:
       </label>
     </div>
     <div class="col-xs-6">

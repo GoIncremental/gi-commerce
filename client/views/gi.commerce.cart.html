@@ -12,7 +12,7 @@
             <th></th>
             <th>Quantity</th>
             <th><div class="pull-right">Amount</div></th>
-            <th><div class="pull-right">Tax</div></th>
+            <th ng-if="giCart.isTaxApplicable()"><div class="pull-right">Tax</div></th>
             <th><div class="pull-right">Total</div></th>
           </tr>
         </thead>
@@ -21,11 +21,11 @@
             <th></th>
             <th></th>
             <th></th>
-            <th></th>
+            <th ng-if="cart.isTaxApplicable()"></th>
             <th>Shipping:</th>
             <th><div class="pull-right">{{ giCart.getShipping() | giCurrency:giCart.getCurrencySymbol }}</div></th>
           </tr>
-          <tr ng-show="giCart.getTaxRate() >= 0">
+          <tr ng-if="giCart.isTaxApplicable()">
             <th></th>
             <th></th>
             <th></th>
@@ -37,7 +37,7 @@
             <th></th>
             <th></th>
             <th></th>
-            <th></th>
+            <th ng-if="giCart.isTaxApplicable()"></th>
             <th><div class="pull-right">Total:</div></th>
             <th><div class="pull-right">{{ giCart.totalCost() | giCurrency:giCart.getCurrencySymbol }}</div></th>
           </tr>
@@ -51,7 +51,7 @@
               {{ item.getQuantity() | number }}&nbsp;&nbsp;
               <span class="glyphicon glyphicon-plus" ng-click="item.setQuantity(1, true)"></span></td>
               <td><div class="pull-right">{{ item.getSubTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
-              <td><div class="pull-right">{{ item.getTaxTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
+              <td ng-if="giCart.isTaxApplicable()"><div class="pull-right">{{ item.getTaxTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
               <td><div class="pull-right">{{ item.getTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
             </tr>
           </tbody>

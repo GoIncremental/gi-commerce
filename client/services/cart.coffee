@@ -5,15 +5,16 @@ angular.module('gi.commerce').provider 'giCart', () ->
     thankyouDirective = d
 
   @$get = ['$q', '$rootScope', '$http', 'giCartItem', 'giLocalStorage'
-  , 'giCountry', 'giCurrency', 'giPayment', 'giMarket', '$window'
+  , 'giCountry', 'giCurrency', 'giPayment', 'giMarket', 'giUtil', '$window'
   , ($q, $rootScope, $http, giCartItem, store, Country, Currency, Payment
-  , Market, $window) ->
+  , Market, Util, $window) ->
     cart = {}
 
     getPricingInfo = () ->
       marketCode: cart.market.code
       taxRate: cart.tax
       taxInclusive: cart.taxInclusive
+      taxExempt: cart.taxExempt
 
     getItemById = (itemId) ->
       build = null
@@ -42,6 +43,7 @@ angular.module('gi.commerce').provider 'giCart', () ->
       cart =
         tax : null
         taxName: ""
+        taxExempt: false
         items : []
         stage: 1
         validStages: {}
@@ -55,28 +57,47 @@ angular.module('gi.commerce').provider 'giCart', () ->
           code: 'UK'
         company: {}
         taxInclusive: true
+        taxApplicable: false
 
       return
 
     save = () ->
       store.set 'cart', cart
 
-    calculateTaxRate = () ->
+    calculateTaxRate = (code) ->
+      vatNumber = code or c.company?.VAT
       deferred = $q.defer()
       countryCode = cart.country.code
       uri = '/api/taxRate?countryCode=' + countryCode
-      if c.company?.VAT?
-        uri += '&vatNumber=' + c.company.VAT
-      if c.billingAddress?.code?
-        uri += '&postalCode=' + c.billingAddress.code
 
       $http.get(uri).success (data) ->
         cart.tax = data.rate
         cart.taxName = data.name
-        deferred.resolve cart.tax
+        cart.taxApplicable = (data.rate > 0)
+
+        if (cart.tax > 0) and vatNumber?
+          exp = Util.vatRegex
+          match = exp.exec(vatNumber)
+          if match?
+            uri = '/api/taxRate?countryCode=' + match[1]
+            uri += '&vatNumber=' + match[0]
+
+          if c.billingAddress?.code?
+            uri += '&postalCode=' + c.billingAddress.code
+
+          $http.get(uri).success (exemptionData) ->
+            cart.taxExempt = data.name? and (exemptionData.rate is 0)
+            deferred.resolve exemptionData
+          .error (err) ->
+            deferred.resolve data
+        else
+          deferred.resolve data
+
       .error (err) ->
         cart.tax = -1
         cart.taxName = ""
+        cart.taxExempt = false
+        cart.taxApplicable = false
         deferred.reject error
 
       deferred.promise
@@ -107,6 +128,15 @@ angular.module('gi.commerce').provider 'giCart', () ->
           cart.tax
         else
           -1
+
+      isTaxApplicable: () ->
+        cart.taxApplicable
+
+      isTaxExempt: () ->
+        cart.taxExempt
+
+      taxName: () ->
+        cart.taxName
 
       setTaxInclusive: (isInclusive) ->
         cart.taxInclusive = isInclusive

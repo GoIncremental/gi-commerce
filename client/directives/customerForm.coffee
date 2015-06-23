@@ -26,7 +26,8 @@ angular.module('gi.commerce').directive 'giCustomerForm'
 
     $scope.isPropertyValidationSuccess = (prop) ->
       fieldUsed(prop) and
-      $scope.customerForm[prop].$valid
+      $scope.customerForm[prop].$valid and
+      $scope.customerForm[prop].$viewValue isnt ""
 
     $scope.isConfirmPasswordSuccess = (prop) ->
       $scope.isPropertyValidationSuccess(prop) and
@@ -46,4 +47,7 @@ angular.module('gi.commerce').directive 'giCustomerForm'
     $scope.$watch 'customerForm.$valid', (valid) ->
       $scope.cart.setStageValidity($scope.stage, valid)
 
+    $scope.$watch 'customerForm.$pending', (pending) ->
+      if pending?
+        $scope.cart.setStageValidity($scope.stage, false)
 ]

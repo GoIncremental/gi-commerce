@@ -80,7 +80,7 @@ angular.module('gi.commerce').factory 'giCartItem'
     +(@getQuantity() * itemPrice).toFixed(2)
 
   item.prototype.getTaxTotal = (priceInfo) ->
-    if priceInfo.taxRate > 0
+    if priceInfo.taxRate > 0 and not (priceInfo.taxExempt)
       itemPrice = @getPrice(priceInfo)
       taxTotal = 0
       if priceInfo.taxInclusive
