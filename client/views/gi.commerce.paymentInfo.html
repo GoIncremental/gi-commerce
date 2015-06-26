@@ -11,7 +11,7 @@
                ng-model="cart.card.number"
                placeholder="Card Number"
                gi-cc-num
-               cc-eager-type />
+               cc-eager-type tabindex="6" />
           <span class="input-group-addon"><i class="fa fa-lg" ng-class="getCreditFont()"></i></span>
         </div>
         <p class="control-label" ng-show="isPropertyValidationError('cardNumber')">
@@ -26,7 +26,7 @@
                  name="cardExpiry"
                  placeholder="MM/YY"
                  ng-model="cart.card.expiry"
-                 gi-cc-exp />
+                 gi-cc-exp tabindex="7"/>
           <span class="input-group-addon"><i class="fa fa-lg" ng-class="getPropertyFont('cardExpiry')"></i></span>
         </div>
         <p class="control-label" ng-show="isPropertyValidationError('cardExpiry')">
@@ -42,7 +42,7 @@
                  ng-model="cart.card.security"
                  placeholder="CVC"
                  gi-cc-cvc
-                 gi-cc-type="cardForm.cardNumber.$giCcType"/>
+                 gi-cc-type="cardForm.cardNumber.$giCcType" tabindex="9"/>
           <span class="input-group-addon"><i class="fa fa-lg" ng-class="getPropertyFont('cardSecurity')"></i></span>
         </div>
         <p class="control-label" ng-show="isPropertyValidationError('cardSecurity')">

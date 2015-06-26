@@ -11,7 +11,7 @@
       <div class="form-group">
         <div class="checkbox checkbox-success checkbox-circle">
           <input type="checkbox" ng-model="cart.business">
-          <label ng-click="cart.business = !cart.business">Buying for a company?  </label>
+          <label ng-click="cart.business = !cart.business" targetindex="0">Buying for a company?  </label>
         </div>
       </div>
     </div>
@@ -86,7 +86,7 @@
                class="form-control"
                name="companyName"
                ng-model="cart.company.name"
-               ng-disabled="!cart.business"/>
+               ng-disabled="!cart.business" tabindex="1"/>
       </div>
       <div ng-if="cart.isTaxApplicable()" class="form-group" ng-class="{'has-error': isPropertyValidationError('vat'), 'has-success': isPropertyValidationSuccess('vat')}">
         <label class="control-label">{{cart.taxName()}} Number (optional):</label>
@@ -95,7 +95,7 @@
                name="vat"
                ng-model="cart.company.VAT"
                ng-disabled="!cart.business"
-               gi-vat/>
+               gi-vat tabindex="2"/>
          <p class="control-label" ng-show="isPropertyValidationError('vat')">
             {{cart.taxName()}} Number is invalid (have you included the 2 digit country code?)
          </p>
