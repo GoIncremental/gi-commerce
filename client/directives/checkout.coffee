@@ -29,4 +29,11 @@ angular.module('gi.commerce').directive 'giCheckout'
       if newVal?
         wrapSpinner Cart.setCountry(newVal.code)
 
+    $scope.payNow = () ->
+      $scope.inPayment = true
+      wrapSpinner(Cart.payNow()).then () ->
+        $scope.inPayment = false
+      , () ->
+        $scope.inPayment = false
+
 ]

@@ -23,7 +23,7 @@
       <div ng-if="cart.getStage() == 1" class="btn btn-primary"
            ng-click="cart.continueShopping()" gi-enter="cart.continueShopping()">Continue Shopping</div>
       <div ng-if="cart.getStage() > 1" class="btn btn-primary"
-           ng-click="cart.prevStage()" gi-enter="cart.prevStage()">Back</div>
+           ng-click="cart.prevStage()" gi-enter="cart.prevStage()" ng-disabled="inPayment">Back</div>
     </div>
     <div class="col-xs-6">
       <div class="pull-right">
@@ -32,7 +32,7 @@
              ng-disabled="cart.isStageInvalid(cart.getStage())"
             tabindex="9" gi-enter="{{ cart.isStageInvalid(cart.getStage()) ? '' : 'cart.checkAccount()'}}">Next</div>
         <div ng-if="cart.getStage() == 3" class="btn btn-primary btn-cart pay-now"
-             tabindex="9" ng-click="cart.payNow()" gi-enter="cart.payNow()" ng-disabled="cart.isStageInvalid(cart.getStage())">Pay Now</div>
+             tabindex="9" ng-click="payNow()" gi-enter="payNow()" ng-disabled="cart.isStageInvalid(cart.getStage())">Pay Now</div>
       </div>
     </div>
   </div>

@@ -11,6 +11,7 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 ##Release Notes
 v0.6.5
 - resolve tab ordering on payment forms
+- provide feedback when processing payment
 
 v0.6.4
 - tidy up mobile cart styling
