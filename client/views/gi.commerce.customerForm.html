@@ -22,7 +22,7 @@
                class="form-control"
                name="firstName"
                ng-model="item.firstName"
-               required/>
+               required tabindex="1"/>
          <p class="control-label" ng-show="isPropertyValidationError('firstName')">
             Please enter your first name.
          </p>
@@ -33,7 +33,7 @@
                class="form-control"
                name="lastName"
                ng-model="item.lastName"
-               required/>
+               required tabindex="1"/>
          <p class="control-label" ng-show="isPropertyValidationError('lastName')">
             Please enter your last name.
          </p>
@@ -46,7 +46,7 @@
                ng-model="item.email"
                required
                gi-username
-               ng-pattern="emailRegex" />
+               ng-pattern="emailRegex" tabindex="1"/>
          <p class="control-label" ng-show="isEmailInvalid()">
             Please enter a valid e-mail.
          </p>
@@ -61,7 +61,7 @@
                name="password"
                ng-model="item.password"
                ng-required="!model.me.loggedIn"
-               gi-password />
+               gi-password tabindex="1" />
          <p class="control-label" ng-show="isPropertyValidationError('password')">
             Password does not meet minimum requirements (8 characters, at least one number)
          </p>
@@ -73,7 +73,7 @@
                name="confirm"
                ng-model="item.confirm"
                ng-required="!model.me.loggedIn"
-               gi-match="item.password"/>
+               gi-match="item.password"  tabindex="1"/>
         <p class="control-label" ng-show="isPropertyValidationError('confirm')">
            Passwords do not match
         </p>
