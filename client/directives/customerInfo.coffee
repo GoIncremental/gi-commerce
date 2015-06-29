@@ -10,10 +10,12 @@ angular.module('gi.commerce').directive 'giCustomerInfo'
     $scope.cart = Cart
 
     $scope.billingAddressOptions =
+     tabIndex: 3
      showPhone: () ->
        Cart.needsShipping() and (not $scope.cart.differentShipping)
 
     $scope.shippingAddressOptions =
+     tabIndex: 4
      showPhone: () ->
        Cart.needsShipping() and $scope.cart.differentShipping
 
