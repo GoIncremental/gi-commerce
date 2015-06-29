@@ -33,11 +33,12 @@ angular.module('gi.commerce').directive 'giCcNum'
         card.parse number
 
       ngModelController.$validators.giCcNumber = (number) ->
-        card.isValid number
+        res = card.isValid number
+        res? and res
 
       ngModelController.$validators.giCcNumberType = (number) ->
-        card.isValid number, $parse(attrs.giCcType)($scope)
-
+        res = card.isValid number, $parse(attrs.giCcType)($scope)
+        res? and res
 
     #return the linking function
     linkFn

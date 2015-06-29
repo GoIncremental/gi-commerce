@@ -27,7 +27,7 @@ angular.module('gi.commerce').factory 'giCard'
       if not number?
         return false
       len = number.length
-      if len < 15
+      if len < 13
         return false
 
       mul = 0

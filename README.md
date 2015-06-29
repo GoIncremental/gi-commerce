@@ -9,6 +9,10 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+
+v0.6.6
+- fixes issue with credit card validation where it would eagerly validate invalid numbers (especially visa)
+
 v0.6.5
 - resolve tab ordering on payment forms
 - provide feedback when processing payment
