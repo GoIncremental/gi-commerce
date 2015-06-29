@@ -9,6 +9,14 @@ angular.module('gi.commerce').directive 'giCustomerInfo'
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
 
+    $scope.billingAddressOptions =
+     showPhone: () ->
+       Cart.needsShipping() and (not $scope.cart.differentShipping)
+
+    $scope.shippingAddressOptions =
+     showPhone: () ->
+       Cart.needsShipping() and $scope.cart.differentShipping
+
     substagesValid = (stage) ->
       () ->
         stage1 = (not $scope.cart.isStageInvalid(stage + '-1'))

@@ -10,6 +10,7 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
     prefix: '@'
     form: '='
     stage: '@'
+    options: '='
 
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart

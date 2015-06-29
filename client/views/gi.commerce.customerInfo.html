@@ -21,7 +21,8 @@
                          model="model"
                          title="Please enter your billing address"
                          prefix="billing"
-                         form="addressForm">
+                         form="addressForm"
+                         options="billingAddressOptions">
         </gi-address-form-fields>
 
         <div ng-if="cart.differentShipping">
@@ -29,7 +30,8 @@
                            model="model"
                            title="Please enter your shipping address"
                            prefix="shipping"
-                           form="addressForm">
+                           form="addressForm"
+                           options="shippingAddressOptions">
           </gi-address-form-fields>
         </div>
       </div>
