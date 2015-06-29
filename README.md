@@ -11,6 +11,7 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 ##Release Notes
 
 v0.6.6
+- Display detailed error messages if the stripe charge fails
 - Capture a phone number for courier when items require shipping.
 - Tab ordering now handles situation where there are multiple address forms visible on a page, and also ensures we autofocus on the first form in customer info capture
 - Fixes issue with credit card validation where it would eagerly validate invalid numbers (especially visa)

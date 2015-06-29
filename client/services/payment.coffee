@@ -32,8 +32,11 @@ angular.module('gi.commerce').factory 'giPayment'
       $http.post('/api/checkout', chargeRequest)
       .success () ->
         deferred.resolve 'payment completed'
-      .error () ->
-        deferred.reject 'payment not completed'
+      .error (data) ->
+        msg = 'payment not completed'
+        if data.message?
+          msg = data.message
+        deferred.reject msg
 
       deferred.promise
 ]
