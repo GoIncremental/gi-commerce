@@ -52,7 +52,7 @@
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-state'),
        'has-success': isPropertyValidationSuccess('{{prefix}}-state')}">
-  <label class="control-label">State:</label>
+  <label class="control-label">{{getStateMessage()}}:</label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-state"

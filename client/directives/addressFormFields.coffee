@@ -1,6 +1,6 @@
 angular.module('gi.commerce').directive 'giAddressFormFields'
-, ['giCart'
-, (Cart) ->
+, ['giCart', 'giI18n'
+, (Cart, I18n) ->
   restrict : 'E'
   templateUrl: 'gi.commerce.addressFormFields.html'
   scope:
@@ -14,6 +14,10 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
 
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
+
+    $scope.getStateMessage = () ->
+      I18n.getCapitalisedMessage('gi-postal-area')
+
     if not $scope.item?
       $scope.item = {}
 

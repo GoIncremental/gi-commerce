@@ -9,6 +9,8 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.6.7
+- Use giI18n for State / County / Region text of address forms
 
 v0.6.6
 - Display detailed error messages if the stripe charge fails
