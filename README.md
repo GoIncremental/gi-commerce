@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.6.10
+- scroll to top after each new checkout stage
+
 v0.6.9
 - use giFocus directive to fix tab ordering in checkout
 
