@@ -40,4 +40,9 @@ angular.module('gi.commerce').directive 'giPaymentInfo'
     $scope.$watch 'cardForm.$valid', (valid) ->
       $scope.cart.setStageValidity($scope.stage, valid)
 
+    scrollToTop = () ->
+      window.scrollTo(0,0)
+
+    scrollToTop()
+
 ]
