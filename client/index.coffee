@@ -1,5 +1,5 @@
 angular.module('gi.commerce', ['gi.util', 'gi.security'])
-.value('version', '0.6.10')
+.value('version', '0.6.11-dev')
 .config(['giI18nProvider', (I18nProvider) ->
   messages =
     US: [
