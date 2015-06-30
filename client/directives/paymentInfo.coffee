@@ -1,6 +1,6 @@
 angular.module('gi.commerce').directive 'giPaymentInfo'
-, ['giCart'
-, (Cart) ->
+, ['$window', 'giCart'
+, ($window, Cart) ->
   restrict : 'E'
   templateUrl: 'gi.commerce.paymentInfo.html'
   scope:
@@ -41,7 +41,7 @@ angular.module('gi.commerce').directive 'giPaymentInfo'
       $scope.cart.setStageValidity($scope.stage, valid)
 
     scrollToTop = () ->
-      window.scrollTo(0,0)
+      $window.scrollTo(0,0)
 
     scrollToTop()
 
