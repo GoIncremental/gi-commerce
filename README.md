@@ -11,6 +11,7 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 ##Release Notes
 v0.7.0
 - add support for custom call to action text next to buy buttons
+- another fix for tab ordering
 
 v0.6.10
 - scroll to top after each new checkout stage
