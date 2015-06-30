@@ -7,6 +7,7 @@ module.exports = (dal) ->
       acl: 'String'
       name: 'String'
       prices: 'Mixed'
+      ctaText: 'String'
 
   modelDefinition.schema = dal.schemaFactory modelDefinition
   model = dal.modelFactory modelDefinition
