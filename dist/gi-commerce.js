@@ -1,4 +1,4 @@
-angular.module('gi.commerce', ['gi.util', 'gi.security']).value('version', '0.6.8').config([
+angular.module('gi.commerce', ['gi.util', 'gi.security']).value('version', '0.6.9').config([
   'giI18nProvider', function(I18nProvider) {
     var messages;
     messages = {
