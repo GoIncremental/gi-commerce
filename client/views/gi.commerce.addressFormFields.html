@@ -81,7 +81,7 @@
 
   <ui-select  tabindex="{{options.tabIndex + 1}}" ng-model="item.country">
     <ui-select-match>{{$select.selected.name}}</ui-select-match>
-    <ui-select-choices repeat="t.code as t in model.countries  | filter: $select.search">
+    <ui-select-choices repeat="t.code as t in model.countries | orderBy:getCountrySorter() | filter: $select.search">
       <div ng-bind-html="t.name | highlight: $select.search"></div>
     </ui-select-choices>
   </ui-select>

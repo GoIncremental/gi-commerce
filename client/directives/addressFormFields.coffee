@@ -1,6 +1,6 @@
 angular.module('gi.commerce').directive 'giAddressFormFields'
-, ['giCart', 'giI18n'
-, (Cart, I18n) ->
+, ['giCart', 'giI18n', 'giUtil'
+, (Cart, I18n, Util) ->
   restrict : 'E'
   templateUrl: 'gi.commerce.addressFormFields.html'
   scope:
@@ -31,4 +31,16 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
       $scope.form[prop].$touched and
       $scope.form[prop].$dirty
 
+    $scope.getCountrySorter = () ->
+      topCodes = []
+      if $scope.cart.getCountryCode()
+        topCodes.push $scope.cart.getCountryCode()
+
+      if not ("US" in topCodes)
+        topCodes.push "US"
+
+      if not ("GB" in topCodes)
+        topCodes.push "GB"
+
+      Util.countrySort(topCodes)
 ]
