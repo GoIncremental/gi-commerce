@@ -41,8 +41,6 @@ angular.module('gi.commerce').factory 'giEcommerceAnalytics'
 
           ga('ec:addProduct', prod)
 
-      console.log 'sending cart details'
-      console.log obj
       ga('ec:setAction', 'checkout', obj)
       ga('send', 'pageview')
 
@@ -71,15 +69,10 @@ angular.module('gi.commerce').factory 'giEcommerceAnalytics'
           quantity: i._quantity
         ga('ec:addProduct', prod)
 
-
-
-    console.log 'sending purchase'
     ga('ec:setAction', 'purchase', {id: id, revenue: rev})
     # ga('send', 'pageview')
     ga('send', 'event', 'Ecommerce', 'Purchase');
 
-
-    console.log 'purchase sent to google'
 
 
 ]

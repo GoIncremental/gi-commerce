@@ -261,7 +261,6 @@ angular.module('gi.commerce').provider 'giCart', () ->
             chargeRequest.company = that.company
 
           Payment.stripe.charge(chargeRequest).then (result) ->
-            console.log result
             $rootScope.$broadcast('giCart:paymentCompleted')
             giEcommerceAnalytics.sendTransaction({ step: 4, option: 'Transaction Complete'}, cart.items)
             that.empty()
