@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.7.2
+- added enhanced e-commerce analytics support
+
 v0.7.1
 - order country dropdowns in addressess alphabetically (with UK and US and current country bumped to the top)
 

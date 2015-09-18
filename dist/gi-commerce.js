@@ -1,4 +1,4 @@
-angular.module('gi.commerce', ['gi.util', 'gi.security']).value('version', '0.7.1').config([
+angular.module('gi.commerce', ['gi.util', 'gi.security']).value('version', '0.7.2-dev').config([
   'giI18nProvider', function(I18nProvider) {
     var messages;
     messages = {
@@ -82,6 +82,7 @@ angular.module('gi.commerce').directive('giAddressFormFields', [
       },
       link: function($scope, elem, attrs) {
         $scope.cart = Cart;
+        Cart.sendCart('Viewed Address Details');
         $scope.getStateMessage = function() {
           return I18n.getCapitalisedMessage('gi-postal-area');
         };
@@ -231,11 +232,12 @@ angular.module('gi.commerce').directive('giCart', [
       templateUrl: 'gi.commerce.cart.html',
       link: function($scope, element, attrs) {
         $scope.giCart = giCart;
-        return $scope.$watch('giCart.totalItems()', function(numItems) {
+        $scope.$watch('giCart.totalItems()', function(numItems) {
           var valid;
           valid = numItems > 0;
           return $scope.giCart.setStageValidity($scope.stage, valid);
         });
+        return giCart.sendCart('Viewed Cart');
       }
     };
   }
@@ -601,6 +603,7 @@ angular.module('gi.commerce').directive('giPaymentInfo', [
       link: function($scope, elem, attrs) {
         var scrollToTop;
         $scope.cart = Cart;
+        Cart.sendCart('Viewed Card Details');
         $scope.getCreditFont = function() {
           switch ($scope.cardForm.cardNumber.$giCcEagerType) {
             case "Visa":
@@ -652,6 +655,7 @@ angular.module('gi.commerce').directive('giPaymentThanks', [
         thanks = angular.element(document.createElement(Cart.thankyouDirective));
         el = $compile(thanks)($scope);
         elem.append(el);
+        Cart.sendCart('Attempted Payment');
       }
     };
   }
@@ -975,7 +979,7 @@ angular.module('gi.commerce').provider('giCart', function() {
     return thankyouDirective = d;
   };
   this.$get = [
-    '$q', '$rootScope', '$http', 'giCartItem', 'giLocalStorage', 'giCountry', 'giCurrency', 'giPayment', 'giMarket', 'giUtil', '$window', function($q, $rootScope, $http, giCartItem, store, Country, Currency, Payment, Market, Util, $window) {
+    '$q', '$rootScope', '$http', 'giCartItem', 'giLocalStorage', 'giCountry', 'giCurrency', 'giPayment', 'giMarket', 'giUtil', '$window', 'giEcommerceAnalytics', function($q, $rootScope, $http, giCartItem, store, Country, Currency, Payment, Market, Util, $window, giEcommerceAnalytics) {
       var c, calculateTaxRate, cart, getItemById, getPricingInfo, getSubTotal, getTaxTotal, init, save;
       cart = {};
       getPricingInfo = function() {
@@ -1258,6 +1262,10 @@ angular.module('gi.commerce').provider('giCart', function() {
             }
             return Payment.stripe.charge(chargeRequest).then(function(result) {
               $rootScope.$broadcast('giCart:paymentCompleted');
+              giEcommerceAnalytics.sendTransaction({
+                step: 4,
+                option: 'Transaction Complete'
+              }, cart.items);
               that.empty();
               return cart.stage = 4;
             }, function(err) {
@@ -1278,6 +1286,12 @@ angular.module('gi.commerce').provider('giCart', function() {
           return localStorage.removeItem('cart');
         },
         save: save,
+        sendCart: function(opt) {
+          return giEcommerceAnalytics.sendCartView({
+            step: cart.stage,
+            option: opt
+          }, cart.items);
+        },
         restore: function(storedCart) {
           init();
           cart.tax = storedCart.tax;
@@ -1449,6 +1463,17 @@ angular.module('gi.commerce').factory('giCurrency', [
 
 angular.module('gi.commerce').factory('giEcommerceAnalytics', [
   'giLog', 'giAnalytics', function(Log, Analytics) {
+    var enhancedEcommerce, google, requireGaPlugin;
+    enhancedEcommerce = false;
+    if (typeof ga !== "undefined" && ga !== null) {
+      google = ga;
+    }
+    requireGaPlugin = function(x) {
+      Log.debug('ga requiring ' + x);
+      if (google != null) {
+        return google('require', x);
+      }
+    };
     return {
       viewProductList: function(name, items) {
         Log.log('Product list: ' + name + ' with: ' + items.length + ' items viewed');
@@ -1464,6 +1489,62 @@ angular.module('gi.commerce').factory('giEcommerceAnalytics', [
           return Analytics.Impression(impression);
         });
         return Analytics.PageView();
+      },
+      sendCartView: function(obj, items) {
+        var i, inCartProducts, j, len, prod;
+        inCartProducts = [];
+        if (google != null) {
+          if (!enhancedEcommerce) {
+            requireGaPlugin('ec');
+          }
+          if (items != null) {
+            for (j = 0, len = items.length; j < len; j++) {
+              i = items[j];
+              prod = {
+                id: i._data.id,
+                name: i._name,
+                quantity: i._quantity
+              };
+              ga('ec:addProduct', prod);
+            }
+          }
+          ga('ec:setAction', 'checkout', obj);
+          return ga('send', 'pageview');
+        }
+      },
+      sendTransaction: function(obj, items) {
+        var i, id, j, len, possible, prod, ref, ref1, ref2, ref3, rev;
+        id = '';
+        possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        i = 0;
+        while (i < 25) {
+          id += possible.charAt(Math.floor(Math.random() * possible.length));
+          i++;
+        }
+        rev = 0;
+        if (google != null) {
+          if (!enhancedEcommerce) {
+            requireGaPlugin('ec');
+          }
+        }
+        if (items != null) {
+          for (j = 0, len = items.length; j < len; j++) {
+            i = items[j];
+            rev += (ref = i._priceList) != null ? (ref1 = ref.prices) != null ? ref1.US : void 0 : void 0;
+            prod = {
+              id: i._data.name,
+              name: i._data.displayName,
+              price: "'" + ((ref2 = i._priceList) != null ? (ref3 = ref2.prices) != null ? ref3.US : void 0 : void 0) + "'" || '',
+              quantity: i._quantity
+            };
+            ga('ec:addProduct', prod);
+          }
+        }
+        ga('ec:setAction', 'purchase', {
+          id: id,
+          revenue: rev
+        });
+        return ga('send', 'event', 'Ecommerce', 'Purchase');
       }
     };
   }
