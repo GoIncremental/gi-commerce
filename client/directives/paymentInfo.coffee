@@ -9,6 +9,8 @@ angular.module('gi.commerce').directive 'giPaymentInfo'
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
 
+    Cart.sendCart('Viewed Card Details')
+
     $scope.getCreditFont = () ->
       switch $scope.cardForm.cardNumber.$giCcEagerType
         when "Visa" then "fa-cc-visa"

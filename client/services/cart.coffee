@@ -5,10 +5,12 @@ angular.module('gi.commerce').provider 'giCart', () ->
     thankyouDirective = d
 
   @$get = ['$q', '$rootScope', '$http', 'giCartItem', 'giLocalStorage'
-  , 'giCountry', 'giCurrency', 'giPayment', 'giMarket', 'giUtil', '$window'
+  , 'giCountry', 'giCurrency', 'giPayment', 'giMarket', 'giUtil', '$window', 'giEcommerceAnalytics'
   , ($q, $rootScope, $http, giCartItem, store, Country, Currency, Payment
-  , Market, Util, $window) ->
+  , Market, Util, $window, giEcommerceAnalytics) ->
     cart = {}
+
+
 
     getPricingInfo = () ->
       marketCode: cart.market.code
@@ -58,7 +60,6 @@ angular.module('gi.commerce').provider 'giCart', () ->
         company: {}
         taxInclusive: true
         taxApplicable: false
-
       return
 
     save = () ->
@@ -261,6 +262,7 @@ angular.module('gi.commerce').provider 'giCart', () ->
 
           Payment.stripe.charge(chargeRequest).then (result) ->
             $rootScope.$broadcast('giCart:paymentCompleted')
+            giEcommerceAnalytics.sendTransaction({ step: 4, option: 'Transaction Complete'}, cart.items)
             that.empty()
             cart.stage = 4
           , (err) ->
@@ -279,6 +281,11 @@ angular.module('gi.commerce').provider 'giCart', () ->
         localStorage.removeItem 'cart'
 
       save: save
+
+
+      sendCart: (opt) ->
+        giEcommerceAnalytics.sendCartView({ step: cart.stage, option: opt}, cart.items)
+
 
       restore: (storedCart) ->
         init()
