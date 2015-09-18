@@ -11,4 +11,6 @@ angular.module('gi.commerce').directive 'giCart'
     $scope.$watch 'giCart.totalItems()', (numItems) ->
       valid = numItems > 0
       $scope.giCart.setStageValidity($scope.stage, valid)
+
+    giCart.sendCart('Viewed Cart')
 ]

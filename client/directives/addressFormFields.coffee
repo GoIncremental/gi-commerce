@@ -15,6 +15,8 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
 
+    Cart.sendCart('Viewed Address Details')
+
     $scope.getStateMessage = () ->
       I18n.getCapitalisedMessage('gi-postal-area')
 

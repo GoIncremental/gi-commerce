@@ -6,5 +6,8 @@ angular.module('gi.commerce').directive 'giPaymentThanks'
     thanks = angular.element(document.createElement(Cart.thankyouDirective))
     el = $compile(thanks) $scope
     elem.append(el)
+
+    Cart.sendCart('Attempted Payment')
+    
     return
 ]
