@@ -41,8 +41,7 @@ angular.module('gi.commerce').factory 'giEcommerceAnalytics'
 
           ga('ec:addProduct', prod)
 
-      console.log 'sending cart details'
-      console.log obj
+
       ga('ec:setAction', 'checkout', obj)
       ga('send', 'pageview')
 
