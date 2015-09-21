@@ -11,6 +11,9 @@ configure = (app, rest) ->
   rest.routeResource 'priceList', app
   , app.middleware.publicReadAction, app.controllers.priceList
 
+  rest.routeResource 'discountCode', app
+  , app.middleware.adminAction, app.controllers.discountCode
+
   rest.routeResource 'currency', app
   , app.middleware.publicReadAction, app.controllers.currency
 
