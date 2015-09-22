@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.7.3
+- added crud diretive to manage discount codes (no cart support yet).
+
 v0.7.2
 - added enhanced e-commerce analytics support
 
