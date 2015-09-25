@@ -26,4 +26,7 @@ configure = (app, rest) ->
   app.get '/api/taxRate', app.middleware.publicAction
   , app.controllers.quaderno.getTaxRate
 
+  app.get '/api/discountCodes/my/:id', app.middleware.publicAction
+  , app.controllers.discountCode.my
+
 exports.configure = configure
