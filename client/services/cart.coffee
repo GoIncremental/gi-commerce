@@ -5,9 +5,9 @@ angular.module('gi.commerce').provider 'giCart', () ->
     thankyouDirective = d
 
   @$get = ['$q', '$rootScope', '$http', 'giCartItem', 'giLocalStorage'
-  , 'giCountry', 'giCurrency', 'giPayment', 'giMarket', 'giUtil', '$window', 'giEcommerceAnalytics'
+  , 'giCountry', 'giCurrency', 'giPayment', 'giMarket', 'giUtil', '$window', 'giEcommerceAnalytics', 'giDiscountCode'
   , ($q, $rootScope, $http, giCartItem, store, Country, Currency, Payment
-  , Market, Util, $window, giEcommerceAnalytics) ->
+  , Market, Util, $window, giEcommerceAnalytics, Discount) ->
     cart = {}
 
 
@@ -41,6 +41,8 @@ angular.module('gi.commerce').provider 'giCart', () ->
 
       +(taxTotal).toFixed(2)
 
+
+
     init = () ->
       cart =
         tax : null
@@ -60,10 +62,13 @@ angular.module('gi.commerce').provider 'giCart', () ->
         company: {}
         taxInclusive: true
         taxApplicable: false
+        discountPercent: 0
       return
 
     save = () ->
       store.set 'cart', cart
+
+
 
     calculateTaxRate = (code) ->
       vatNumber = code or c.company?.VAT
@@ -107,6 +112,23 @@ angular.module('gi.commerce').provider 'giCart', () ->
     c =
       init: init
 
+      checkCode: (code) ->
+        deferred = $q.defer()
+        cart.discountPercent = 0
+        if code? and code isnt ''
+          uri = '/api/discountCodes/my/' + code
+          $http.get(uri).success( (data, status) ->
+            if data?
+              cart.discountPercent = data.percent
+            deferred.resolve(cart.discountPercent)
+          ).error (data) ->
+            deferred.reject 'Could not check code'
+        else
+          deferred.reject 'No code supplied'
+        deferred.promise
+
+
+
       addItem: (id, name, priceList, quantity, data) ->
 
         inCart = getItemById(id)
@@ -133,6 +155,9 @@ angular.module('gi.commerce').provider 'giCart', () ->
       isTaxApplicable: () ->
         cart.taxApplicable
 
+      getDiscount: () ->
+        cart.discountPercent
+
       isTaxExempt: () ->
         cart.taxExempt
 
@@ -145,6 +170,7 @@ angular.module('gi.commerce').provider 'giCart', () ->
       getSubTotal: getSubTotal
 
       getTaxTotal: getTaxTotal
+
 
       getItems: () ->
         cart.items
@@ -227,7 +253,19 @@ angular.module('gi.commerce').provider 'giCart', () ->
         result
 
       totalCost:  () ->
-        getSubTotal() + getTaxTotal()
+        percentage = (cart.discountPercent / 100)
+        tot = getSubTotal() + getTaxTotal()
+        cart.savings = (percentage * tot)
+        tot - (percentage * tot)
+
+      discount: () ->
+        cart.savings
+
+      hasDiscount: () ->
+        if cart.savings
+          return true
+        else
+          return false
 
       removeItem: (index) ->
         cart.items.splice index, 1
