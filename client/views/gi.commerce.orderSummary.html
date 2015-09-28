@@ -21,6 +21,18 @@
   <div class="row">
     <div class="col-md-2">
     </div>
+    <div class="col-md-4" ng-if="cart.hasDiscount()">
+      <label class="order-summary">Discount:</label>
+    </div>
+    <div class="col-md-4" ng-if="cart.hasDiscount()">
+      <div class="pull-right">
+        <label class="order-summary">({{ cart.discount() | giCurrency:cart.getCurrencySymbol }})</label>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-2">
+    </div>
     <div class="col-md-4" ng-if="cart.isTaxApplicable()">
       <label class="order-summary">Tax:</label>
     </div>
@@ -30,6 +42,7 @@
       </div>
     </div>
   </div>
+
   <div class="row">
     <div class="col-md-2">
     </div>
@@ -45,38 +58,44 @@
   </div>
 </div>
 <div class="visible-sm visible-xs">
-<div class = "form-inline well" style="height: 140px; ">
-  <div class="row">
-    <div class="col-md-2">
+  <div class = "form-inline well" style="height: 180px">
+    <div class="row">
+      <div class="col-md-2">
 
+      </div>
+      <div class="col-md-8">
+        <legend>Order Summary</legend>
+      </div>
     </div>
-    <div class="col-md-8">
-      <legend>Order Summary</legend>
-    </div>
-  </div>
 
     <div style="margin-top: -10px;">
-    <div class="col-xs-6" >
-      <label class="pull-right">Amount:
+      <div class="col-xs-6" >
+        <label style="font-weight: normal" class="pull-right">Amount:
+        </label>
+      </div>
+      <div  style="text-align: right" class="col-xs-6">
+        <label style="font-weight: normal"><span class="">{{ cart.getSubTotal() | giCurrency:cart.getCurrencySymbol }}</span></label>
+      </div>
+
+      <div class="col-xs-6" ng-if="cart.hasDiscount()">
+        <label class="pull-right" style="font-weight: normal">Discount:</label>
+      </div>
+      <div class="col-xs-6" style="text-align: right;" ng-if="cart.hasDiscount()">
+          <label style="font-weight: normal" >({{ cart.discount() | giCurrency:cart.getCurrencySymbol }})</label>      </div>
+    <div class="col-xs-6" ng-if="cart.isTaxApplicable()">
+      <label class="pull-right" style="font-weight: normal">Tax:
       </label>
     </div>
-    <div class="col-xs-6">
-      <label><span class="">{{ cart.getSubTotal() | giCurrency:cart.getCurrencySymbol }}</span></label>
-    </div>
-    <div class="col-xs-6" ng-if="cart.isTaxApplicable()">
-      <label class="pull-right">Tax:
-      </label>
-    </div>
-    <div class="col-xs-6" ng-if="cart.isTaxApplicable()">
-      <label><span class="">{{ cart.getTaxTotal() | giCurrency:cart.getCurrencySymbol }}</span></label>
+    <div class="col-xs-6" style="text-align: right;" ng-if="cart.isTaxApplicable()">
+      <label style="font-weight: normal"><span class="pull-right">{{ cart.getTaxTotal() | giCurrency:cart.getCurrencySymbol }}</span></label>
     </div>
     <div class="col-xs-6">
       <label class="pull-right">Total:
       </label>
     </div>
-    <div class="col-xs-6">
-      <label>{{ cart.totalCost() | giCurrency:cart.getCurrencySymbol }}</label>
-    </div>
+    <div style="text-align: right;" class="col-xs-6">
+      <label >{{ cart.totalCost() | giCurrency:cart.getCurrencySymbol }}</label>
     </div>
   </div>
+</div>
 </div>

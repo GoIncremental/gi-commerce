@@ -38,8 +38,10 @@ angular.module('gi.commerce').provider 'giCart', () ->
       priceInfo = getPricingInfo()
       angular.forEach cart.items, (item) ->
         taxTotal += item.getTaxTotal(priceInfo)
-
+      taxSavings = taxTotal  *  (cart.discountPercent / 100)
+      taxTotal = taxTotal - taxSavings
       +(taxTotal).toFixed(2)
+
 
 
 
@@ -254,9 +256,10 @@ angular.module('gi.commerce').provider 'giCart', () ->
 
       totalCost:  () ->
         percentage = (cart.discountPercent / 100)
+        subTot = getSubTotal()
         tot = getSubTotal() + getTaxTotal()
-        cart.savings = (percentage * tot)
-        tot - (percentage * tot)
+        cart.savings = (percentage * subTot)
+        tot - (percentage * subTot)
 
       discount: () ->
         cart.savings

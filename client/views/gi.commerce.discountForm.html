@@ -1,16 +1,14 @@
 <div class="row">
-  <div class="container">
-    <div class="col-md-4">
+    <div  class="col-md-4 col-xs-12">
       <form class="navbar-form navbar-left" role="search">
-        <label for="dc"> Apply Discount Code </label>
+        <label for="dc"> Apply Discount Code (case sensitive)</label>
 
         <div class="form-group">
 
-          <input type="text" id="dc" class="form-control discount-input"  ng-model="code">
+          <input type="text" id="dc" class="form-control "  ng-model="code">
         </div>
-        <button type="submit" class="btn btn-primary btn-discount-code" ng-click="checkCode(code)">Submit</button>
+        <button type="submit" class="btn btn-primary btn-dc" style="background: #2980b9; border: none;" ng-click="checkCode(code)">Submit</button>
       </form>
     </div>
-  </div>
 </div>
 </br>

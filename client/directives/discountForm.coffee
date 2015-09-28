@@ -12,7 +12,7 @@ angular.module('gi.commerce').directive 'giDiscountForm'
           alert =
             name: 'code-redeemed'
             type: 'success'
-            msg: code + ' redeemed successfuly'
+            msg: code + ' redeemed successfully'
           $scope.$emit 'event:show-alert',alert
         else
           alert =
