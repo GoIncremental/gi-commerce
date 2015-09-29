@@ -9,6 +9,9 @@ Best served as a component of [gi](https://github.com/goincremental/gi) but if y
 - Client side components: `bower install gi-commerce`
 
 ##Release Notes
+v0.7.6
+- fixed issue displaying incorrect total on mobile views
+
 v0.7.5
 - improvements to discount views
 
