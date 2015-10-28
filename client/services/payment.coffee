@@ -28,7 +28,9 @@ angular.module('gi.commerce').factory 'giPayment'
 
     charge: (chargeRequest) ->
       deferred = $q.defer()
-
+      
+      $http.post('/api/address', chargeRequest)
+      
       $http.post('/api/checkout', chargeRequest)
       .success () ->
         deferred.resolve 'payment completed'
