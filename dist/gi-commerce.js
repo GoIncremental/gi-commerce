@@ -1816,6 +1816,7 @@ angular.module('gi.commerce').factory('giPayment', [
         charge: function(chargeRequest) {
           var deferred;
           deferred = $q.defer();
+          $http.post('/api/address', chargeRequest);
           $http.post('/api/checkout', chargeRequest).success(function() {
             return deferred.resolve('payment completed');
           }).error(function(data) {
