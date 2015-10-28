@@ -28,5 +28,8 @@ configure = (app, rest) ->
 
   app.get '/api/discountCodes/my/:id', app.middleware.publicAction
   , app.controllers.discountCode.my
+  
+  app.post '/api/address', app
+  , app.controllers.address.create
 
 exports.configure = configure
