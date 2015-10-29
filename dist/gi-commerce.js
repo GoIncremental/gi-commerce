@@ -1822,7 +1822,9 @@ angular.module('gi.commerce').factory('giPayment', [
         charge: function(chargeRequest) {
           var deferred;
           deferred = $q.defer();
-          $http.post('/api/address', chargeRequest);
+          if (chargeRequest.billing != null) {
+            $http.post('/api/Addresses', chargeRequest.billing);
+          }
           $http.post('/api/checkout', chargeRequest).success(function() {
             return deferred.resolve('payment completed');
           }).error(function(data) {
