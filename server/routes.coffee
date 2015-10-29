@@ -23,13 +23,13 @@ configure = (app, rest) ->
   rest.routeResource 'market', app
   , app.middleware.publicReadAction, app.controllers.market
 
+  rest.routeResource 'address', app
+  , app.middleware.userAction, app.controllers.address
+  
   app.get '/api/taxRate', app.middleware.publicAction
   , app.controllers.quaderno.getTaxRate
 
   app.get '/api/discountCodes/my/:id', app.middleware.publicAction
   , app.controllers.discountCode.my
   
-  app.post '/api/address', app
-  , app.controllers.address.create
-
 exports.configure = configure
