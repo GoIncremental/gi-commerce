@@ -900,6 +900,12 @@ angular.module('gi.commerce').filter('giMarketId', [
   }
 ]);
 
+angular.module('gi.commerce').factory('Address', [
+  'giCrud', function(Crud) {
+    return Crud.factory('Addresses');
+  }
+]);
+
 angular.module('gi.commerce').factory('giCard', [
   'giCardType', function(CardType) {
     var camelCase, card, cardTypes, cvcRegex, isCvcValid;
