@@ -28,8 +28,10 @@ angular.module('gi.commerce').factory 'giPayment'
 
     charge: (chargeRequest) ->
       deferred = $q.defer()
-      
-      $http.post('/api/Addresses', chargeRequest.billing) if chargeRequest.billing?
+      if chargeRequest.billing?
+        address = chargeRequest.billing
+        address.userId = chargeRequest.customer._id
+        $http.post('/api/Addresses', address)
       
       $http.post('/api/checkout', chargeRequest)
       .success () ->

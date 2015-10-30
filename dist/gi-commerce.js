@@ -1820,10 +1820,12 @@ angular.module('gi.commerce').factory('giPayment', [
           return deferred.promise;
         },
         charge: function(chargeRequest) {
-          var deferred;
+          var address, deferred;
           deferred = $q.defer();
           if (chargeRequest.billing != null) {
-            $http.post('/api/Addresses', chargeRequest.billing);
+            address = chargeRequest.billing;
+            address.userId = chargeRequest.customer._id;
+            $http.post('/api/Addresses', address);
           }
           $http.post('/api/checkout', chargeRequest).success(function() {
             return deferred.resolve('payment completed');
