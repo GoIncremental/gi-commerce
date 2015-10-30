@@ -1,4 +1,18 @@
 <legend>{{title}}</legend>
+<div ng-if="item._id" class="form-group"
+     ng-class="{
+       'has-error': isPropertyValidationError('{{prefix}}-name'),
+       'has-success': isPropertyValidationSuccess('{{prefix}}-name')}">
+  <label class="control-label">Address Name:</label>
+  <input type="text"
+         class="form-control"
+         name="{{prefix}}-name"
+         ng-model="item.name"
+         required tabindex="{{options.tabIndex}}"/>
+   <p class="control-label" ng-show="isPropertyValidationError('{{prefix}}-name')">
+     Required
+   </p>
+</div>
 <div class="form-group"
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-line1'),
