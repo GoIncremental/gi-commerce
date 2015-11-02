@@ -6,6 +6,22 @@
     <gi-customer-form item="cart.customerInfo" model="model" stage="{{stage}}-1"><gi-customer-form>
   </div>
 </div>
+
+<div ng-form ng-if="cart.addresses.length ">
+  <div class="row">
+    <div class="col-md-8">
+      <div ng-form name="addressForm" class="form well">
+        <div ng-repeat="address in cart.addresses">
+          <div class="checkbox checkbox-success checkbox-circle">
+            <input type="radio" name="address" ng-model="selectedAddress" value="{{address._id}}">
+            <label ng-click="selectAddress(address._id)">{{ address.name != "" && address.name || "Un-named" }}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-md-8">
     <div ng-form name="addressForm" class="form well">
