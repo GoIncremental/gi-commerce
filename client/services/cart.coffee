@@ -284,16 +284,16 @@ angular.module('gi.commerce').provider 'giCart', () ->
         if @billingAddress
           @billingAddress.userId = @customer._id
           if @billingAddress._id?
-            $http.put('/api/Addresses/' + @billingAddress._id, @billingAddress)
+            $http.put('/api/addresses/' + @billingAddress._id, @billingAddress)
           else
-            $http.post('/api/Addresses/', @billingAddress)
+            $http.post('/api/addresses/', @billingAddress)
         if @shippingAddress
           console.log(@shippingAddress)
           @shippingAddress.userId = @customer._id
           if @shippingAddress._id?
-            $http.put('/api/Addresses/' + @shippingAddress._id, @shippingAddress)
+            $http.put('/api/addresses/' + @shippingAddress._id, @shippingAddress)
           else
-            $http.post('/api/Addresses/', @shippingAddress)
+            $http.post('/api/addresses/', @shippingAddress)
         cart.stage += 1
 
       payNow: () ->

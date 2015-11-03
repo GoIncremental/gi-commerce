@@ -23,7 +23,7 @@ configure = (app, rest) ->
   rest.routeResource 'market', app
   , app.middleware.publicReadAction, app.controllers.market
 
-  rest.routeResource 'Addresses', app
+  rest.routeResource 'addresses', app
   , app.middleware.userAction, app.controllers.address
   
   app.get '/api/taxRate', app.middleware.publicAction
