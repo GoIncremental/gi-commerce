@@ -1,4 +1,10 @@
 <legend>{{title}}</legend>
+<div ng-if="!item._id" class="form-group">
+  <label class="control-label">Existing Address:</label>
+    <select class="form-control" ng-options="address.name ? address.name : address.line1 for address in addresses" ng-model="address">
+      <option value="" selected>New address...</option>
+    </select>
+</div>
 <div ng-if="item._id" class="form-group"
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-name'),
