@@ -13,6 +13,7 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
     options: '='
     addresses: '='
     selectaddress: '='
+    deleteAddress: '='
 
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart

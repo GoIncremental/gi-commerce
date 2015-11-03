@@ -1,3 +1,4 @@
+<div ng-if="!selectaddress && item._id" class="pull-right"><a class="text-danger" ng-click="deleteAddress(item)">x</a></div>
 <legend>{{title}}</legend>
 <div ng-if="selectaddress && addresses.length" class="form-group">
   <label class="control-label">Existing Address:</label>
