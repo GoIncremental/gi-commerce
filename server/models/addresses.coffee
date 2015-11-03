@@ -11,6 +11,7 @@ module.exports = (dal) ->
       state:	'String'
       code:		'String'
       country:	'String'
+      phone:    'String'
       userId:	'ObjectId'
 
   modelDefinition.schema = dal.schemaFactory modelDefinition
