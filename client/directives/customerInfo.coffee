@@ -13,8 +13,9 @@ angular.module('gi.commerce').directive 'giCustomerInfo'
     $scope.selectAddress = (id) ->
       $scope.selectedAddress = id
     
-    Address.query({ userId: $scope.model.me.user._id }).then (addresses) ->
-      $scope.cart.addresses = addresses
+    if $scope.model.me.user?
+      Address.query({ userId: $scope.model.me.user._id }).then (addresses) ->
+        $scope.cart.addresses = addresses
       
     $scope.billingAddressOptions =
      tabIndex: 3

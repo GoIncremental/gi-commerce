@@ -7,15 +7,21 @@
   </div>
 </div>
 
-<div ng-form ng-if="cart.addresses.length ">
+<div ng-form ng-if="cart.addresses.length">
   <div class="row">
     <div class="col-md-8">
       <div ng-form name="addressForm" class="form well">
         <div ng-repeat="address in cart.addresses">
           <div class="checkbox checkbox-success checkbox-circle">
-            <input type="radio" name="address" ng-model="selectedAddress" value="{{address._id}}">
+            <input type="checkbox" ng-checked="selectedAddress == address._id">
             <label ng-click="selectAddress(address._id)">{{ address.name != "" && address.name || "Un-named" }}</label>
           </div>
+          <div ng-if="address.line1">{{address.line1}}</div>
+          <div ng-if="address.line2">{{address.line2}}</div>
+          <div ng-if="address.state">{{address.state}}</div>
+          <div ng-if="address.code">{{address.code}}</div>
+          <div ng-if="address.city">{{address.city}}</div>
+          <div ng-if="address.country">{{address.country}}</div>
         </div>
       </div>
     </div>
@@ -50,6 +56,7 @@
                            options="shippingAddressOptions">
           </gi-address-form-fields>
         </div>
+      
       </div>
     </div>
   </div>
