@@ -1,11 +1,11 @@
 <legend>{{title}}</legend>
-<div ng-if="selectaddress" class="form-group">
+<div ng-if="selectaddress && addresses.length" class="form-group">
   <label class="control-label">Existing Address:</label>
     <select class="form-control" ng-model="selectedAddress" ng-change="updateAddress(selectedAddress)" ng-options="address.name ? address.name : address.line1 for address in addresses">
       <option value="" selected>New address...</option>
     </select>
 </div>
-<div ng-if="item._id" class="form-group"
+<div ng-if="!selectaddress" class="form-group"
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-name'),
        'has-success': isPropertyValidationSuccess('{{prefix}}-name')}">
