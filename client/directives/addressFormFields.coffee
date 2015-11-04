@@ -11,6 +11,9 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
     form: '='
     stage: '@'
     options: '='
+    addresses: '='
+    selectaddress: '='
+    deleteAddress: '='
 
   link: ($scope, elem, attrs) ->
     $scope.cart = Cart
@@ -45,4 +48,8 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
         topCodes.push "GB"
 
       Util.countrySort(topCodes)
+    
+    $scope.updateAddress = (selectedAddress) ->
+      $scope.item = selectedAddress
+    
 ]

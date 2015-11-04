@@ -1,4 +1,22 @@
+<div ng-if="!selectaddress && item._id" class="pull-right"><a class="text-danger" ng-click="deleteAddress(item)">x</a></div>
 <legend>{{title}}</legend>
+<div ng-if="selectaddress && addresses.length" class="form-group">
+  <label class="control-label">Existing Address:</label>
+    <select class="form-control" ng-model="selectedAddress" ng-change="updateAddress(selectedAddress)" ng-options="address.name ? address.name : address.line1 for address in addresses">
+      <option value="" selected>New address...</option>
+    </select>
+</div>
+<div ng-if="!selectaddress" class="form-group"
+     ng-class="{
+       'has-error': isPropertyValidationError('{{prefix}}-name'),
+       'has-success': isPropertyValidationSuccess('{{prefix}}-name')}">
+  <label class="control-label">Address Name:</label>
+  <input type="text"
+         class="form-control"
+         name="{{prefix}}-name"
+         ng-model="item.name"
+         required tabindex="{{options.tabIndex}}"/>
+</div>
 <div class="form-group"
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-line1'),

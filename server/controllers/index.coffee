@@ -4,6 +4,7 @@ quaderno = require './quaderno'
 
 module.exports = (app) ->
   discountCode = require('./discountCode') app.models.discountCodes
+  address:      conFac app.models.addresses
   priceList:    conFac app.models.priceLists
   currency:     conFac app.models.currencies
   country:      conFac app.models.countries
