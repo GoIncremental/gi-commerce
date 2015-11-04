@@ -281,6 +281,19 @@ angular.module('gi.commerce').provider 'giCart', () ->
       checkAccount: () ->
         if @customerInfo and (not @customer)
           $rootScope.$broadcast('giCart:accountRequired', @customerInfo)
+        if @billingAddress
+          @billingAddress.userId = @customer._id
+          if @billingAddress._id?
+            $http.put('/api/addresses/' + @billingAddress._id, @billingAddress)
+          else
+            $http.post('/api/addresses/', @billingAddress)
+        if @shippingAddress
+          console.log(@shippingAddress)
+          @shippingAddress.userId = @customer._id
+          if @shippingAddress._id?
+            $http.put('/api/addresses/' + @shippingAddress._id, @shippingAddress)
+          else
+            $http.post('/api/addresses/', @shippingAddress)
         cart.stage += 1
 
       payNow: () ->

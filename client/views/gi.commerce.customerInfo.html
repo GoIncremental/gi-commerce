@@ -6,6 +6,7 @@
     <gi-customer-form item="cart.customerInfo" model="model" stage="{{stage}}-1"><gi-customer-form>
   </div>
 </div>
+
 <div class="row">
   <div class="col-md-8">
     <div ng-form name="addressForm" class="form well">
@@ -22,6 +23,8 @@
                          title="Please enter your billing address"
                          prefix="billing"
                          form="addressForm"
+                         addresses="cart.addresses"
+                         selectaddress="true"
                          options="billingAddressOptions">
         </gi-address-form-fields>
 
@@ -31,9 +34,12 @@
                            title="Please enter your shipping address"
                            prefix="shipping"
                            form="addressForm"
+                           addresses="cart.addresses"
+                           selectaddress="true"
                            options="shippingAddressOptions">
           </gi-address-form-fields>
         </div>
+      
       </div>
     </div>
   </div>
