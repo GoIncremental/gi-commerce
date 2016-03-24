@@ -2,9 +2,12 @@
 <legend>{{title}}</legend>
 <div ng-if="selectaddress && addresses.length" class="form-group">
   <label class="control-label">Existing Address:</label>
-    <select class="form-control" ng-model="selectedAddress" ng-change="updateAddress(selectedAddress)" ng-options="address.name ? address.name : address.line1 for address in addresses">
-      <option value="" selected>New address...</option>
-    </select>
+    <ui-select  tabindex="{{options.tabIndex + 1}}" ng-model="selectedAddress" ng-change="updateAddress(selectedAddress)">
+      <ui-select-match>{{$select.selected.name}}</ui-select-match>
+      <ui-select-choices repeat="t in addresses | filter: $select.search">
+        <div ng-bind="t.name ? t.name : t.line1"></div>
+      </ui-select-choices>
+    </ui-select>
 </div>
 <div ng-if="!selectaddress" class="form-group"
      ng-class="{
