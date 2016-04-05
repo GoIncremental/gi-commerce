@@ -284,7 +284,7 @@ angular.module('gi.commerce').directive('giCartSummary', [
 ]);
 
 angular.module('gi.commerce').directive('giCheckout', [
-  'giCart', 'usSpinnerService', function(Cart, Spinner) {
+  'giCart', 'usSpinnerService', 'Address', function(Cart, Spinner, Address) {
     return {
       restrict: 'E',
       scope: {
@@ -315,7 +315,12 @@ angular.module('gi.commerce').directive('giCheckout', [
         });
         $scope.$watch('model.me', function(me) {
           if ((me != null ? me.user : void 0) != null) {
-            return Cart.setCustomer(me.user);
+            Cart.setCustomer(me.user);
+            return Address.query({
+              userId: me.user._id
+            }).then(function(addresses) {
+              return $scope.cart.addresses = addresses;
+            });
           }
         });
         $scope.$watch('model.userCountry', function(newVal) {
