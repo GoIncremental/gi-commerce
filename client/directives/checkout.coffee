@@ -6,6 +6,8 @@ angular.module('gi.commerce').directive 'giCheckout'
     model: '='
   templateUrl: 'gi.commerce.checkout.html'
   link: ($scope, element, attrs) ->
+
+
     stopSpinner = () ->
       Spinner.stop('gi-cart-spinner-1')
       Cart.setValidity true
@@ -16,10 +18,15 @@ angular.module('gi.commerce').directive 'giCheckout'
       promise.then stopSpinner, stopSpinner
 
     $scope.cart = Cart
+
+    if $scope.cart.getItems().length == 0
+      $scope.cart.setStage(1)
+
     $scope.$watch 'cart.getStage()', (newVal) ->
       if newVal?
         if newVal is 3
           wrapSpinner $scope.cart.calculateTaxRate()
+
 
     $scope.$watch 'model.me', (me) ->
       if me?.user?
