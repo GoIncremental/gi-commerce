@@ -1,5 +1,7 @@
 <div ng-if="!selectaddress && item._id" class="pull-right"><a class="text-danger" ng-click="deleteAddress(item)">x</a></div>
-<legend>{{title}}</legend>
+<legend>{{title}}   <h4 class="pull-right" style="font-size: 11px;"><span class="req">*</span> Marks a required field.</h4>
+</legend>
+
 <div ng-if="selectaddress && addresses.length" class="form-group">
   <label class="control-label">Existing Address:</label>
     <ui-select  tabindex="{{options.tabIndex + 1}}" ng-model="selectedAddress" ng-change="updateAddress(selectedAddress)">
@@ -13,7 +15,7 @@
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-name'),
        'has-success': isPropertyValidationSuccess('{{prefix}}-name')}">
-  <label class="control-label">Address Name:</label>
+  <label class="control-label">Address Name <span class="req">*</span> : </label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-name"
@@ -24,7 +26,7 @@
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-line1'),
        'has-success': isPropertyValidationSuccess('{{prefix}}-line1')}">
-  <label class="control-label">Address Line 1:</label>
+  <label class="control-label">Address Line 1 <span class="req">*</span> : </label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-line1"
@@ -45,7 +47,7 @@
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-city'),
        'has-success': isPropertyValidationSuccess('{{prefix}}-city')}">
-  <label class="control-label">City:</label>
+  <label class="control-label">City <span class="req">*</span> :</label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-city"
@@ -59,7 +61,7 @@
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-state'),
        'has-success': isPropertyValidationSuccess('{{prefix}}-state')}">
-  <label class="control-label">{{getStateMessage()}}:</label>
+  <label class="control-label">{{getStateMessage()}} <span class="req">*</span> :</label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-state"
@@ -73,7 +75,7 @@
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-code'),
        'has-success': isPropertyValidationSuccess('{{prefix}}-code')}">
-  <label class="control-label">Post / Zip Code:</label>
+  <label class="control-label">Post / Zip Code <span class="req">*</span> :</label>
   <input type="text"
          class="form-control"
          name="{{prefix}}-code"
@@ -98,7 +100,7 @@
        ng-class="{
          'has-error': isPropertyValidationError('{{prefix}}-phone'),
          'has-success': isPropertyValidationSuccess('{{prefix}}-phone')}">
-    <label class="control-label">Phone Number (for Delivery Courier):</label>
+    <label class="control-label">Phone Number (for Delivery Courier) <span class="req">*</span> :</label>
     <input type="text"
         class="form-control"
         name="{{prefix}}-phone"
