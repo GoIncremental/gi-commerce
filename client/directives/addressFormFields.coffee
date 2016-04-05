@@ -26,6 +26,10 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
     if not $scope.item?
       $scope.item = {}
 
+    $scope.checkValid = (country) ->
+      if country
+        $scope.validCountry = true
+
     $scope.isPropertyValidationError = (prop) ->
       $scope.form[prop].$invalid and
       $scope.form[prop].$touched and
@@ -48,8 +52,8 @@ angular.module('gi.commerce').directive 'giAddressFormFields'
         topCodes.push "GB"
 
       Util.countrySort(topCodes)
-    
+
     $scope.updateAddress = (selectedAddress) ->
       $scope.item = selectedAddress
-    
+
 ]

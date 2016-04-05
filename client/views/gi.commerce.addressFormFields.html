@@ -85,12 +85,13 @@
       Required
    </p>
 </div>
-<div class="form-group">
-  <label class="control-label">Country:</label>
+<div class="form-group"    ng-class="{'has-success': validCountry}">
+  <label  class="control-label">Country <span class="req">*</span>:</label>
 
-  <ui-select  tabindex="{{options.tabIndex}}" ng-model="item.country">
-    <ui-select-match>{{$select.selected.name}}</ui-select-match>
-    <ui-select-choices repeat="t.code as t in model.countries | orderBy:getCountrySorter() | filter: $select.search">
+  <ui-select  tabindex="{{options.tabIndex}}" required on-select="checkValid($select.selected.name)" ng-model="item.country">
+    <ui-select-match >{{$select.selected.name}}</ui-select-match>
+    <ui-select-choices
+ repeat="t.code as t in model.countries | orderBy:getCountrySorter() | filter: $select.search">
       <div ng-bind-html="t.name | highlight: $select.search"></div>
     </ui-select-choices>
   </ui-select>
