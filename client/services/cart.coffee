@@ -43,8 +43,6 @@ angular.module('gi.commerce').provider 'giCart', () ->
       +(taxTotal).toFixed(2)
 
 
-
-
     init = () ->
       cart =
         tax : null
@@ -217,14 +215,19 @@ angular.module('gi.commerce').provider 'giCart', () ->
 
       saveAddress: (address) ->
         address.userId = @customer._id
-        if address._id?
-          $http.put('/api/addresses/' + address._id, address)
-        else
-          $http.post('/api/addresses/', address)
+        required = (address.line1? and (address.line1 isnt "")) or
+        (address.city? and (address.line2 isnt "")) or
+        (address.postCode? and (address.postCode isnt ""))
+
+        if required
+          if address._id?
+            $http.put('/api/addresses/' + address._id, address)
+          else
+            $http.post('/api/addresses/', address)
 
       setCustomer: (customer) ->
         @customer = customer
-        if @billingAddress && !@billingAddress._id?
+        if @billingAddress? && !@billingAddress._id?
           @saveAddress @billingAddress
         if @shippingAddress && !@shippingAddress._id?
           @saveAddress @shippingAddress
@@ -297,6 +300,7 @@ angular.module('gi.commerce').provider 'giCart', () ->
         if @shippingAddress && @customer
           @saveAddress @shippingAddress
         cart.stage += 1
+
 
       payNow: () ->
         that = @
