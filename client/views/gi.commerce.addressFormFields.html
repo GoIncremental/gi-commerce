@@ -41,20 +41,6 @@
          name="{{prefix}}-line2"
          ng-model="item.line2" tabindex="{{options.tabIndex}}"/>
 </div>
-<div class="form-group" ng-if="options.showPhone()"
-     ng-class="{
-       'has-error': isPropertyValidationError('{{prefix}}-phone'),
-       'has-success': isPropertyValidationSuccess('{{prefix}}-phone')}">
-  <label class="control-label">Phone Number (for Delivery Courier):</label>
-  <input type="text"
-      class="form-control"
-      name="{{prefix}}-phone"
-      ng-model="item.phone"
-      required tabindex="{{options.tabIndex}}"/>
-  <p class="control-label" ng-show="isPropertyValidationError('{{prefix}}-phone')">
-   Required
-  </p>
-</div>
 <div class="form-group"
      ng-class="{
        'has-error': isPropertyValidationError('{{prefix}}-city'),
@@ -107,3 +93,18 @@
     </ui-select-choices>
   </ui-select>
 </div>
+
+  <div class="form-group" ng-if="options.showPhone()"
+       ng-class="{
+         'has-error': isPropertyValidationError('{{prefix}}-phone'),
+         'has-success': isPropertyValidationSuccess('{{prefix}}-phone')}">
+    <label class="control-label">Phone Number (for Delivery Courier):</label>
+    <input type="text"
+        class="form-control"
+        name="{{prefix}}-phone"
+        ng-model="item.phone"
+        required tabindex="{{options.tabIndex}}"/>
+    <p class="control-label" ng-show="isPropertyValidationError('{{prefix}}-phone')">
+     Required
+    </p>
+  </div>
