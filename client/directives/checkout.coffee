@@ -1,6 +1,6 @@
 angular.module('gi.commerce').directive 'giCheckout'
-, ['giCart', 'usSpinnerService'
-, (Cart, Spinner) ->
+, ['giCart', 'usSpinnerService', 'Address'
+, (Cart, Spinner, Address) ->
   restrict : 'E',
   scope:
     model: '='
@@ -31,6 +31,8 @@ angular.module('gi.commerce').directive 'giCheckout'
     $scope.$watch 'model.me', (me) ->
       if me?.user?
         Cart.setCustomer(me.user)
+        Address.query({ userId: $scope.model.me.user._id }).then (addresses) ->
+          $scope.cart.addresses = addresses
 
     $scope.$watch 'model.userCountry', (newVal) ->
       if newVal?
