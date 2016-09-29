@@ -1192,11 +1192,12 @@ angular.module('gi.commerce').provider('giCart', function() {
             return deferred.resolve(data);
           }
         }).error(function(err) {
+          console.log('error getting tax rate');
           cart.tax = -1;
           cart.taxName = "";
           cart.taxExempt = false;
           cart.taxApplicable = false;
-          return deferred.reject(error);
+          return deferred.reject(err);
         });
         return deferred.promise;
       };
@@ -1717,7 +1718,7 @@ angular.module('gi.commerce').factory('giEcommerceAnalytics', [
             rev_old((ref = i._priceList) != null ? (ref1 = ref.prices) != null ? ++ref1.US : void 0 : void 0);
             rev += parseFloat((ref2 = i._priceList) != null ? (ref3 = ref2.prices) != null ? ref3.US : void 0 : void 0);
             console.log('---');
-            console.log(sending(transaction));
+            console.log('sending transaction');
             console.log(rev);
             console.log(rev_old);
             console.log('---');
