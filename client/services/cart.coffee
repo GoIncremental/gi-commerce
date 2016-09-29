@@ -100,11 +100,12 @@ angular.module('gi.commerce').provider 'giCart', () ->
           deferred.resolve data
 
       .error (err) ->
+        console.log 'error getting tax rate'
         cart.tax = -1
         cart.taxName = ""
         cart.taxExempt = false
         cart.taxApplicable = false
-        deferred.reject error
+        deferred.reject err
 
       deferred.promise
 
