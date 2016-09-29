@@ -6,6 +6,8 @@ module.exports = () ->
   quadernoKey = process.env['QUADERNO_KEY']
 
   getTaxRate: (req, res) ->
+    console.log '---'
+    console.log 'in quaaderno get tax rate'
     code = req.query.countryCode or 'GB'
 
     url = quadernoAPI + '/api/v1/taxes/calculate.json?country=' + code
@@ -16,10 +18,17 @@ module.exports = () ->
     auth =
       user: quadernoKey
       pass: "x"
+    
+    console.log url
+    console.log auth
 
     request.get url, {auth: auth}, (err, response, body) ->
       if err?
+        console.log 'error!'
+        console.log err
         res.json 500, err
       else
+        console.log 'response!'
         out = JSON.parse(body)
+        console.log out
         res.json 200, out

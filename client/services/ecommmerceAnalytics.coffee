@@ -63,7 +63,7 @@ angular.module('gi.commerce').factory 'giEcommerceAnalytics'
     if items?
       for i in items
 
-        rev_old ++ i._priceList?.prices?.US
+        rev_old += i._priceList?.prices?.US
         rev += parseFloat(i._priceList?.prices?.US)
         console.log '---'
         console.log 'sending transaction'
