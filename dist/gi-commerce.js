@@ -1697,7 +1697,7 @@ angular.module('gi.commerce').factory('giEcommerceAnalytics', [
         }
       },
       sendTransaction: function(obj, items) {
-        var i, id, j, len, possible, prod, ref, ref1, ref2, ref3, ref4, ref5, rev, rev_old;
+        var i, id, j, len, possible, prod, ref, ref1, ref2, ref3, rev;
         id = '';
         possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         i = 0;
@@ -1706,7 +1706,6 @@ angular.module('gi.commerce').factory('giEcommerceAnalytics', [
           i++;
         }
         rev = 0;
-        rev_old = 0;
         if (google != null) {
           if (!enhancedEcommerce) {
             requireGaPlugin('ec');
@@ -1715,17 +1714,11 @@ angular.module('gi.commerce').factory('giEcommerceAnalytics', [
         if (items != null) {
           for (j = 0, len = items.length; j < len; j++) {
             i = items[j];
-            rev_old += (ref = i._priceList) != null ? (ref1 = ref.prices) != null ? ref1.US : void 0 : void 0;
-            rev += parseFloat((ref2 = i._priceList) != null ? (ref3 = ref2.prices) != null ? ref3.US : void 0 : void 0);
-            console.log('---');
-            console.log('sending transaction');
-            console.log(rev);
-            console.log(rev_old);
-            console.log('---');
+            rev += parseFloat((ref = i._priceList) != null ? (ref1 = ref.prices) != null ? ref1.US : void 0 : void 0);
             prod = {
               id: i._data.name,
               name: i._data.displayName,
-              price: "'" + ((ref4 = i._priceList) != null ? (ref5 = ref4.prices) != null ? ref5.US : void 0 : void 0) + "'" || '',
+              price: "'" + ((ref2 = i._priceList) != null ? (ref3 = ref2.prices) != null ? ref3.US : void 0 : void 0) + "'" || '',
               quantity: i._quantity
             };
             ga('ec:addProduct', prod);
