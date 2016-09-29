@@ -55,21 +55,13 @@ angular.module('gi.commerce').factory 'giEcommerceAnalytics'
       i++
 
     rev = 0
-    rev_old = 0
     if google?
       if not enhancedEcommerce
         requireGaPlugin 'ec'
 
     if items?
       for i in items
-
-        rev_old += i._priceList?.prices?.US
         rev += parseFloat(i._priceList?.prices?.US)
-        console.log '---'
-        console.log 'sending transaction'
-        console.log rev
-        console.log rev_old
-        console.log '---'
         prod =
           id: i._data.name,
           name: i._data.displayName,
