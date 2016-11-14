@@ -326,9 +326,11 @@ angular.module('gi.commerce').provider 'giCart', () ->
               uri = '/api/taxRate?countryCode=' + match[1]
               uri += '&vatNumber=' + match[0]
               $http.get(uri).success (exemptionData) ->
-                chargeRequest.tax.rate = exemptionData?.rate
+                chargeRequest.tax.rate = exemptionData?.rate or 0
                 chargeRequest.tax.name = exemptionData?.name
                 that.makeCharge(chargeRequest, that)
+              .error (err) ->
+                $rootScope.$broadcast('giCart:paymentFailed', err)
             else
               that.makeCharge(chargeRequest, that)
           else
