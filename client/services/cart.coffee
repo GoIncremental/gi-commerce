@@ -320,16 +320,32 @@ angular.module('gi.commerce').provider 'giCart', () ->
 
           if that.company?
             chargeRequest.company = that.company
+            exp = Util.vatRegex
+            match = exp.exec(that.company.VAT)
+            if match?
+              uri = '/api/taxRate?countryCode=' + match[1]
+              uri += '&vatNumber=' + match[0]
+              $http.get(uri).success (exemptionData) ->
+                chargeRequest.tax.rate = exemptionData?.rate or 0
+                chargeRequest.tax.name = exemptionData?.name
+                that.makeCharge(chargeRequest, that)
+              .error (err) ->
+                $rootScope.$broadcast('giCart:paymentFailed', err)
+            else
+              that.makeCharge(chargeRequest, that)
+          else
+            that.makeCharge(chargeRequest, that)
 
-          Payment.stripe.charge(chargeRequest).then (result) ->
-            $rootScope.$broadcast('giCart:paymentCompleted')
-            giEcommerceAnalytics.sendTransaction({ step: 4, option: 'Transaction Complete'}, cart.items)
-            that.empty()
-            cart.stage = 4
-          , (err) ->
-            $rootScope.$broadcast('giCart:paymentFailed', err)
+
+      makeCharge: (chargeRequest, that) ->
+        Payment.stripe.charge(chargeRequest).then (result) ->
+          $rootScope.$broadcast('giCart:paymentCompleted')
+          giEcommerceAnalytics.sendTransaction({ step: 4, option: 'Transaction Complete'}, cart.items)
+          that.empty()
+          cart.stage = 4
         , (err) ->
           $rootScope.$broadcast('giCart:paymentFailed', err)
+
 
       empty: () ->
         @billingAddress = {}
