@@ -1408,7 +1408,7 @@ angular.module('gi.commerce').provider('giCart', function() {
           var that;
           that = this;
           return Payment.stripe.getToken(that.card).then(function(token) {
-            var chargeRequest, item;
+            var chargeRequest, exp, item, match, uri;
             chargeRequest = {
               token: token.id,
               total: that.totalCost(),
@@ -1437,18 +1437,35 @@ angular.module('gi.commerce').provider('giCart', function() {
             };
             if (that.company != null) {
               chargeRequest.company = that.company;
+              exp = Util.vatRegex;
+              match = exp.exec(that.company.VAT);
+              if (match != null) {
+                uri = '/api/taxRate?countryCode=' + match[1];
+                uri += '&vatNumber=' + match[0];
+                return $http.get(uri).success(function(exemptionData) {
+                  chargeRequest.tax.rate = (exemptionData != null ? exemptionData.rate : void 0) || 0;
+                  chargeRequest.tax.name = exemptionData != null ? exemptionData.name : void 0;
+                  return that.makeCharge(chargeRequest, that);
+                }).error(function(err) {
+                  return $rootScope.$broadcast('giCart:paymentFailed', err);
+                });
+              } else {
+                return that.makeCharge(chargeRequest, that);
+              }
+            } else {
+              return that.makeCharge(chargeRequest, that);
             }
-            return Payment.stripe.charge(chargeRequest).then(function(result) {
-              $rootScope.$broadcast('giCart:paymentCompleted');
-              giEcommerceAnalytics.sendTransaction({
-                step: 4,
-                option: 'Transaction Complete'
-              }, cart.items);
-              that.empty();
-              return cart.stage = 4;
-            }, function(err) {
-              return $rootScope.$broadcast('giCart:paymentFailed', err);
-            });
+          });
+        },
+        makeCharge: function(chargeRequest, that) {
+          return Payment.stripe.charge(chargeRequest).then(function(result) {
+            $rootScope.$broadcast('giCart:paymentCompleted');
+            giEcommerceAnalytics.sendTransaction({
+              step: 4,
+              option: 'Transaction Complete'
+            }, cart.items);
+            that.empty();
+            return cart.stage = 4;
           }, function(err) {
             return $rootScope.$broadcast('giCart:paymentFailed', err);
           });
