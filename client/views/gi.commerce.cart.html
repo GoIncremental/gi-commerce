@@ -60,12 +60,14 @@
               <td><span ng-click="giCart.removeItem($index)" class="glyphicon glyphicon-remove"></span></td>
               <td>{{ item.getName() }}</td>
               <td><span class="glyphicon glyphicon-minus" ng-class="{'disabled':item.getQuantity()==1}"
-                ng-click="item.setQuantity(-1, true)"></span>&nbsp;&nbsp;
-                {{ item.getQuantity() | number }}&nbsp;&nbsp;
+                ng-click="item.getQuantity()==1 ? giCart.removeItem($index) : item.setQuantity(-1, true)"></span>&nbsp;&nbsp;
+
+                <input class="counter-input" maxlength="3" type="text"  ng-model="item._quantity" ng-change="item.setQuantity(item._quantity)">&nbsp;&nbsp;
+
                 <span class="glyphicon glyphicon-plus" ng-click="item.setQuantity(1, true)"></span></td>
                 <td ng-if="giCart.isTaxApplicable()"><div class="pull-right"></div></td>
                 <td><div class="pull-right"></div></td>
-                <tdng-if="!giCart.isTaxApplicable()" ><div class="pull-right"></div></td>
+                <td ng-if="!giCart.isTaxApplicable()" ><div class="pull-right"></div></td>
 
                 <td><div class="pull-right">{{ item.getSubTotal(giCart.getPricingInfo()) | giCurrency:giCart.getCurrencySymbol}}</div></td>
               </tr>
