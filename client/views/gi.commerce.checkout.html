@@ -20,14 +20,14 @@
   </div>
   <div class="row">
     <div class="col-xs-6">
-      <div ng-if="cart.getStage() == 1" class="btn btn-primary"
+      <div ng-if="cart.getStage() == 1" class="btn btn-primary btn-continue-shopping"
            ng-click="cart.continueShopping()" gi-enter="cart.continueShopping()">Continue Shopping</div>
       <div ng-if="cart.getStage() > 1" class="btn btn-primary"
            ng-click="cart.prevStage()" gi-enter="cart.prevStage()" ng-disabled="inPayment">Back</div>
     </div>
     <div class="col-xs-6">
       <div class="pull-right">
-        <div ng-if="cart.getStage() < 3" class="btn btn-primary btn-cart"
+        <div ng-if="cart.getStage() < 3" class="btn btn-primary btn-cart btn-next"
              ng-click="cart.checkAccount()"
              ng-disabled="cart.isStageInvalid(cart.getStage())"
             tabindex="9" gi-enter="{{ cart.isStageInvalid(cart.getStage()) ? '' : 'cart.checkAccount()'}}">Next</div>
